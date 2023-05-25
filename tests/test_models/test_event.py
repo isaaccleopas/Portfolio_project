@@ -5,6 +5,7 @@ Contains the TestEventDocs classes
 from datetime import datetime
 import inspect
 import models
+from models import storage
 from models import event
 from models.base_model import BaseModel
 import pep8

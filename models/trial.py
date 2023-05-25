@@ -1,7 +1,5 @@
 #!/usr/bin/python3
 import os
-import sys
-sys.path.append("/home/vagrant/Portfolio_project")
 #Print environment variables
 print(os.environ.get('EVENT_MYSQL_HOST'))
 print(os.environ.get('EVENT_MYSQL_USER'))

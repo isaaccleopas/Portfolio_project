@@ -19,6 +19,12 @@ class User(BaseModel, Base):
         events = relationship("Event", backref="user")
         reservations = relationship("Reservation", backref="user")
 
+    else:
+        name = ""
+        email = ""
+        password = ""
+        google_id = ""
+        facebook_id = ""
 
     def __init__(self, *args, **kwargs):
         """Initializes user"""

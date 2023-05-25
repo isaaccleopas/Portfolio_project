@@ -4,6 +4,7 @@ import inspect
 import models
 import pep8 as pycodestyle
 import time
+from models import storage
 from unittest import mock
 from datetime import datetime
 from models.base_model import BaseModel
