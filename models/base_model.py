@@ -2,7 +2,6 @@
 """
 Contains the BaseModel Class
 """
-import models
 from os import getenv
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
@@ -10,22 +9,27 @@ from sqlalchemy import Column, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 import uuid
 import hashlib
+import models
 
-Base = declarative_base()
-db = SQLAlchemy()
+time = "%Y-%m-%dT%H:%M:%S.%f"
+
+if models.storage_t == "db":
+    Base = declarative_base()
+else:
+    Base = object
 
 class BaseModel:
     """BaseModel class from which other classes will inherit base data"""
-    __abstract__ = True
-    id = Column(String (60), primary_key=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow)
+    if models.storage_t == 'db':
+        id = Column(String(60), primary_key=True)
+        created_at = Column(DateTime, default=datetime.utcnow)
+        updated_at = Column(DateTime, default=datetime.utcnow)
 
     def __init__(self, *args, **kwargs):
         """Initializes the base model"""
         if kwargs:
             for key, value in kwargs.items():
-                if != "__class__":
+                if key != "__class__":
                     setattr(self, key, value)
             if kwargs.get("created_at", None) and type(self.created_at) is str:
                 self.created_at = datetime.strptime(kwargs["created_at"], time)
@@ -38,19 +42,18 @@ class BaseModel:
                 self.created_at = datetime.utcnow()
                 self.updated_at = self.created_at
 
-    def __str__:
+    def __str__(self):
         """String representation of Base model"""
-        return "[{:s}] ({:s}) {}".format(self.__class__.__name__,
-                                         self.id, self.__dict__)
+        return "[{:s}] ({:s}) {}".format(self.__class__.__name__, self.id, self.__dict__)
 
     def save(self):
-        """Updates the attribute updated_at with current datetime"""
+        """Updates the attribute updated_at with the current datetime"""
         updated_at = datetime.utcnow()
         models.storage.new(self)
-        models.storage.save(self)
+        models.storage.save()
 
     def to_dict(self, dump=None):
-        """returns a dictionary containing all keys/values of the instance"""
+        """Returns a dictionary containing all keys/values of the instance"""
         new_dict = self.__dict__.copy()
         if "created_at" in new_dict:
             new_dict["created_at"] = new_dict["created_at"].strftime(time)
@@ -59,11 +62,11 @@ class BaseModel:
         new_dict["__class__"] = self.__class__.__name__
         if "_sa_instance_state" in new_dict:
             del new_dict["_sa_instance_state"]
-        if getenv("HBNB_TYPE_STORAGE") == "db":
+        if models.storage_t == "db":
             if 'password' in new_dict:
                 del new_dict["password"]
         return new_dict
 
     def delete(self):
-        """delete the current instance from the storage"""
+        """Deletes the current instance from the storage"""
         models.storage.delete(self)

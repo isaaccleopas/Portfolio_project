@@ -1,14 +1,14 @@
 #!/usr/bin/python3
 """Contains user class"""
-
+import models
 from models.base_model import BaseModel, Base
 from sqlalchemy.orm import relationship
 from sqlalchemy import Column, String
+import hashlib
 
 class User(BaseModel, Base):
     """Represents user attributes"""
-    if models.storage == 'db':
-
+    if models.storage_t == 'db':
         __tablename__ = "users"
         name = Column(String(128), nullable=False)
         email = Column(String(128), unique=True, nullable=False)
