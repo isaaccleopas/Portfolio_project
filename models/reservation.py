@@ -1,21 +1,21 @@
 #!/usr/bin/python3
-"""Contains rrservation class"""
+"""Contains reservation class"""
 import models
-from sqlalchemy import Column, String, ForeignKey
+from sqlalchemy import Column, String, ForeignKey, Integer
+from sqlalchemy.orm import relationship
 from models.base_model import BaseModel, Base
 
 
 class Reservation(BaseModel, Base):
     """Represents reservation attributes"""
-    if models.storage_t == 'db':
-        __tablename__ = "reservations"
-        event_id = Column(String(60), ForeignKey('events.id'), nullable=False)
-        user_id = Column(String(60), ForeignKey('users.id'), nullable=False)
-
-    else:
-        event_id = ""
-        user_id = ""
-
+    __tablename__ = "reservations"
+    event_id = Column(String(60), ForeignKey('events.id'), nullable=False)
+    user_id = Column(String(60), ForeignKey('users.id'), nullable=False)
+    slots_reserved = Column(Integer, nullable=False)
+    event = relationship("Event", back_populates="reservations",
+                         overlaps="reservations")
+    user = relationship("User", back_populates="reservations")
+    
     def __init__(self, *args, **kwargs):
-        """initializes Reservation"""
+        """Initializes Reservation"""
         super().__init__(*args, **kwargs)

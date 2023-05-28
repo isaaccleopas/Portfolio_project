@@ -1,58 +1,50 @@
-#!/usr/bin/python3
-import os
-import sys
-sys.path.append("/home/vagrant/Portfolio_project")
-#Print environment variables
-print(os.environ.get('EVENT_MYSQL_HOST'))
-print(os.environ.get('EVENT_MYSQL_USER'))
-print(os.environ.get('EVENT_MYSQL_PASSWORD'))
-print(os.environ.get('EVENT_MYSQL_DB'))
-print(os.environ.get('EVENT_TYPE_STORAGE'))
-
-from models import storage
+from datetime import datetime
+from models.engine.db_storage import DBStorage
 from models.user import User
 from models.event import Event
 from models.review import Review
 from models.reservation import Reservation
 
-# Set environment variable
-os.environ['EVENT_MYSQL_HOST'] = 'localhost'
-os.environ['EVENT_MYSQL_USER'] = 'event_dev'
-os.environ['EVENT_MYSQL_PWD'] = 'Event_dev_pwd1@'
-os.environ['EVENT_MYSQL_DB'] = 'event_dev_db'
+def populate_database():
+    # Initialize the database storage
+    storage = DBStorage()
+    storage.reload()  # Initialize the session
 
+    # Create some example users
+    user1 = User(name="John Doe", email="john@example.com", password="password1")
+    user2 = User(name="Jane Smith", email="jane@example.com", password="password2")
 
-# Create user instance
-user = User(name="John Doe", email="johndoe@example.com", password="password123")
-user.save()
+    # Create some example events
+    event1 = Event(title="Event 1", description="Description of Event 1", image="event1.jpg",
+                   venue="Venue 1", date_time=datetime(2023, 5, 26, 10, 0), slots_available=50,
+                   user=user1)
+    event2 = Event(title="Event 2", description="Description of Event 2", image="event2.jpg",
+                   venue="Venue 2", date_time=datetime(2023, 5, 27, 15, 30), slots_available=30,
+                   user=user2)
 
-# Create event instance
-event = Event(title="Event 1", description="Description of Event 1", image="event1.jpg", venue="Venue 1")
-event.save()
+    # Create some example reviews
+    review1 = Review(content="Review 1 content", event=event1, user=user1)
+    review2 = Review(content="Review 2 content", event=event2, user=user2)
 
-# Create review instance
-review = Review(content="This event was great!", event_id=event.id, user_id=user.id)
-review.save()
+    # Create some example reservations
+    reservation1 = Reservation(event=event1, user=user1, slots_reserved=2)
+    reservation2 = Reservation(event=event2, user=user2, slots_reserved=3)
 
-# Create reservation instance
-reservation = Reservation(event_id=event.id)
-reservation.save()
+    # Add the objects to the session
+    storage.new(user1)
+    storage.new(user2)
+    storage.new(event1)
+    storage.new(event2)
+    storage.new(review1)
+    storage.new(review2)
+    storage.new(reservation1)
+    storage.new(reservation2)
 
-# Access the populated data
-all_users = storage.all(User)
-all_events = storage.all(Event)
-all_reviews = storage.all(Review)
-all_reservations = storage.all(Reservation)
+    # Save the changes to the database
+    storage.save()
 
-# Print the populated data
-for user in all_users.values():
-    print(user)
+    # Close the session
+    storage.close()
 
-for event in all_events.values():
-    print(event)
-
-for review in all_reviews.values():
-    print(review)
-
-for reservation in all_reservations.values():
-    print(reservation)
+if __name__ == "__main__":
+    populate_database()

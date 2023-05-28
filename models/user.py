@@ -8,23 +8,17 @@ import hashlib
 
 class User(BaseModel, Base):
     """Represents user attributes"""
-    if models.storage_t == 'db':
-        __tablename__ = "users"
-        name = Column(String(128), nullable=False)
-        email = Column(String(128), unique=True, nullable=False)
-        password = Column(String(100), nullable=False)
-        google_id = Column(String(128), unique=True)
-        facebook_id = Column(String(128), unique=True)
-        reviews = relationship("Review", backref="user")
-        events = relationship("Event", backref="user")
-        reservations = relationship("Reservation", backref="user")
-
-    else:
-        name = ""
-        email = ""
-        password = ""
-        google_id = ""
-        facebook_id = ""
+    __tablename__ = "users"
+    name = Column(String(128), nullable=False)
+    email = Column(String(128), unique=True, nullable=False)
+    password = Column(String(100), nullable=False)
+    google_id = Column(String(128), unique=True)
+    facebook_id = Column(String(128), unique=True)
+    reviews = relationship("Review", back_populates="user")
+    events = relationship("Event", back_populates="user",
+                          cascade="all, delete")
+    reservations = relationship("Reservation", back_populates="user",
+                                cascade="all, delete")
 
     def __init__(self, *args, **kwargs):
         """Initializes user"""
