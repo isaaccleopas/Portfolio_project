@@ -4,6 +4,8 @@ This module handles all default RestFul API actions for Reservations.
 """
 from flask import abort, jsonify, request
 from models import storage
+from models.event import Event
+from models.user import User
 from models.reservation import Reservation
 from api.v1.views import app_views
 
