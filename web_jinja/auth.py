@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 """ Starts a Flash Web Application """
+from flask import flash
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
@@ -43,12 +44,10 @@ def signup():
 
         user = User(name=name, email=email, password=password)
         storage.new(user)
-        storage.save()  # Save the user object to the database
+        storage.save()
 
-        # You can add a success message here or redirect to another page
         return redirect(url_for('signin'))
 
-    # Render the signup template for GET requests
     return render_template('signup.html')
 
 
@@ -63,11 +62,11 @@ def signin():
         users = storage.all(User)
         user = next((user for user in users.values() if user.email == email), None)
 
-        print("User:", user)  # Debug information
-
-        if user and user.password == password:
+        if user and user.validate_password(password):
             session['user_id'] = user.id
-            return redirect(url_for('profile'))  # Redirect to the profile page
+            return redirect(url_for('profile'))
+        else:
+            flash('Invalid email or password', 'error')
 
     return render_template('signin.html', form=form)
 
@@ -84,7 +83,6 @@ def profile():
     """profile display"""
     if 'user_id' in session:
         user_id = session['user_id']
-
         user = storage.get(User, user_id)
 
         if user:

@@ -86,6 +86,7 @@ class DBStorage:
         objects = self.all(cls)
         return objects.get(key, None)
 
+
     def count(self, cls=None):
         """
         Returns the number of objects in storage matching the given class name.
@@ -95,12 +96,3 @@ class DBStorage:
             if cls is None or cls is clss or cls is clss.__name__:
                 nobjects += len(self.__session.query(clss).all())
         return nobjects
-
-    def get_by(self, model, **kwargs):
-        """
-        Get a record from the database based on the provided model and keyword arguments.
-        """
-        try:
-            return self.__session.query(model).filter_by(**kwargs).first()
-        except NoResultFound:
-            return None

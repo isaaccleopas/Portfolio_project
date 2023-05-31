@@ -20,6 +20,10 @@ class User(BaseModel, Base):
     reservations = relationship("Reservation", back_populates="user",
                                 cascade="all, delete")
 
+    def validate_password(self, password):
+        hashed_input_password = hashlib.md5(password.encode()).hexdigest()
+        return self.password == hashed_input_password
+
     def __init__(self, *args, **kwargs):
         """Initializes user"""
         super().__init__(*args, **kwargs)

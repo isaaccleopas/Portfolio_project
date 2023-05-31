@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Create Event</h1>
+  <form method="POST" action="{{ url_for('create_event') }}" enctype="multipart/form-data">
+    {{ form.csrf_token }}
+
+    {{ form.title.label }}
+    {{ form.title() }}
+    {% if form.title.errors %}
+      <ul class="errors">
+        {% for error in form.title.errors %}
+          <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {{ form.description.label }}
+    {{ form.description() }}
+    {% if form.description.errors %}
+      <ul class="errors">
+        {% for error in form.description.errors %}
+          <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {{ form.image.label }}
+    {{ form.image() }}
+    {% if form.image.errors %}
+      <ul class="errors">
+        {% for error in form.image.errors %}
+          <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {{ form.venue.label }}
+    {{ form.venue() }}
+    {% if form.venue.errors %}
+      <ul class="errors">
+        {% for error in form.venue.errors %}
+          <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {{ form.date_time.label }}
+    {{ form.date_time() }}
+    {% if form.date_time.errors %}
+      <ul class="errors">
+        {% for error in form.date_time.errors %}
+          <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {{ form.slots_available.label }}
+    {{ form.slots_available() }}
+    {% if form.slots_available.errors %}
+      <ul class="errors">
+        {% for error in form.slots_available.errors %}
+          <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    <button type="submit">Create</button>
+  </form>
+{% endblock %}
