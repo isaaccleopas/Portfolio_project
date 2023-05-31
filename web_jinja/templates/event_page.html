@@ -1,0 +1,15 @@
+<h1>{{ event.title }}</h1>
+ <img src="{{ url_for('static', filename='images/' + event.image) }}" alt="Event Image">
+ <p>Date and Time: {{ event.date_time }}</p>
+ <p>Venue: {{ event.venue }}</p>
+ <p>Slots Available: {{ event.slots_available }}</p>
+ <p>Description: {{ event.description }}</p>
+
+{% if event.slots_available > 0 %}
+    <form action="/reserve" method="POST">
+        <input type="hidden" name="event_id" value="{{ event.id }}">
+        <button type="submit" class="reserve-btn">Reserve</button>
+    </form>
+{% else %}
+    <p>No slots available</p>
+{% endif %}
