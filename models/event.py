@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """Contains event class"""
-from sqlalchemy import Column, String, DateTime, Integer, ForeignKey
+from sqlalchemy import Column, String, LargeBinary, DateTime, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 from models.base_model import BaseModel, Base
 import models
@@ -10,7 +10,7 @@ class Event(BaseModel, Base):
     __tablename__ = "events"
     title = Column(String(128), nullable=False)
     description = Column(String(256), nullable=False)
-    image = Column(String(128), nullable=False)
+    image = Column(String(255))
     venue = Column(String(128), nullable=False)
     date_time = Column(DateTime, nullable=False)
     slots_available = Column(Integer, nullable=False)
@@ -22,4 +22,6 @@ class Event(BaseModel, Base):
                            cascade="all, delete")
 
     def __init__(self, *args, **kwargs):
+        image_file = kwargs.pop("image_file", None)  # Rename the argument to avoid conflict
         super().__init__(*args, **kwargs)
+        self.image = image_file

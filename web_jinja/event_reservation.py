@@ -4,7 +4,7 @@ import requests
 from models import storage
 from models.event import Event
 from models.reservation import Reservation
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, current_user, login_required
 app = Flask(__name__)
 
 
@@ -14,39 +14,30 @@ def close_db(error):
     storage.close()
 
 
+
 @app.route('/reserve', methods=['POST'])
+@login_required
 def reserve_event():
-    """function that reserves a slot for a user"""
+    """Function that reserves a slot for a user"""
     event_id = request.form.get('event_id')
-    response = requests.get(f'http://localhost:5000/api/v1/events/{event_id}')
-    if response.status_code == 200:
-        event = response.json()
-        if event['slots_available'] > 0:
-            user_id = 'your_user_id'  # Set the user_id based on the currently logged-in user
-            slots_reserved = 1  # Set the number of slots to reserve (e.g., 1)
-            reservation_data = {
-                'user_id': user_id,
-                'event_id': event_id,
-                'slots_reserved': slots_reserved
-            }
-            reservation_response = requests.post('http://localhost:5000/api/v1/reservations',
-                                                 json=reservation_data)
-            if reservation_response.status_code == 201:
-                event['slots_available'] -= slots_reserved
-                update_response = requests.put(f'http://localhost:5000/api/v1/events/{event_id}',
-                                               json=event)
-                if update_response.status_code == 200:
-                    return redirect(f'/event/{event_id}')
-                else:
-                    return render_template('error.html', message='Failed to update event')
-            else:
-                return render_template('error.html', message='Failed to create reservation')
+
+    event = storage.get(Event, event_id)
+
+    if event:
+        if event.slots_available > 0:
+            user_id = current_user.id
+            slots_reserved = 1
+            reservation = Reservation(user_id=user_id, event_id=event_id,
+                                      slots_reserved=slots_reserved)
+            storage.new(reservation)
+            storage.save()
+            event.slots_available -= slots_reserved
+            storage.save()
+            return redirect(f'/event/{event_id}')
         else:
             return render_template('error.html', message='No slots available')
     else:
         return render_template('error.html', message='Failed to retrieve event')
-
-
 
 if __name__ == "__main__":
     """ Main Function """

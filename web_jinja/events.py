@@ -18,7 +18,14 @@ def display_events():
     """Retrieve the first 9 events from the API"""
     response = requests.get('http://0.0.0.0:5000/api/v1/events')
     if response.status_code == 200:
-        events = response.json()[:9]  # Retrieve the first 9 events from the API
+        events = response.json()
+
+        for event in events:
+            if event['image'] is not None:
+                event['image_path'] = '/static/images/' + event['image']
+            else:
+                event['image_path'] = '/static/images/default.jpg'  # Provide a default image path
+
         return render_template('events.html', events=events)
     else:
         return render_template('error.html', message='Failed to retrieve events')

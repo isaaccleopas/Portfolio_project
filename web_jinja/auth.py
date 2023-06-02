@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 """ Starts a Flash Web Application """
+import base64
+import requests
 from flask import flash
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
@@ -8,10 +10,16 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Email, EqualTo
 from models import storage
 from models.user import User
+import os
+from models.event import Event
+from .forms import CreateEventForm
+from flask_wtf import csrf
+from werkzeug.utils import secure_filename
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '575ea3040135364ec552de39befd1add'
+app.config['UPLOAD_FOLDER'] = ''
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -70,6 +78,56 @@ def signin():
 
     return render_template('signin.html', form=form)
 
+@app.route('/events')
+def display_events():
+    """Retrieve the first 9 events from the API"""
+    response = requests.get('http://0.0.0.0:5000/api/v1/events')
+    if response.status_code == 200:
+        events = response.json()
+
+        for event in events:
+            if event['image'] is not None:
+                event['image_path'] = '/static/images/' + event['image']
+            else:
+                event['image_path'] = '/static/images/default.jpg'  # Provide a default image p>
+        return render_template('events.html', events=events)
+    else:
+        return render_template('error.html', message='Failed to retrieve events')
+
+@app.route('/event/<event_id>')
+def view_event(event_id):
+    """Retrieve the event from the API using the event_id"""
+    response = requests.get(f'http://0.0.0.0:5000/api/v1/events/{event_id}')
+    if response.status_code == 200:
+        event = response.json()
+        return render_template('event_page.html', event=event)
+    else:
+        return render_template('error.html', message='Failed to retrieve event')
+
+@app.route('/reserve', methods=['POST'])
+@login_required
+def reserve_event():
+    """Function that reserves a slot for a user"""
+    event_id = request.form.get('event_id')
+
+    event = storage.get(Event, event_id)
+
+    if event:
+        if event.slots_available > 0:
+            user_id = current_user.id
+            slots_reserved = 1
+            reservation = Reservation(user_id=user_id, event_id=event_id,
+                                      slots_reserved=slots_reserved)
+            storage.new(reservation)
+            storage.save()
+            event.slots_available -= slots_reserved
+            storage.save()
+            return redirect(f'/event/{event_id}')
+        else:
+            return render_template('error.html', message='No slots available')
+    else:
+        return render_template('error.html', message='Failed to retrieve event')
+
 
 @app.route('/signout')
 def signout():
@@ -89,6 +147,72 @@ def profile():
             return render_template('profile.html', user=user)
 
     return redirect('/signin')
+
+
+def current_user():
+    """current user session"""
+    user_id = session.get('user_id')
+    if user_id:
+        user = storage.get(User, user_id)
+        return user
+    else:
+        return None
+
+@app.route('/create_event', methods=['GET', 'POST'])
+def create_event():
+    """ Creating event"""
+    if not current_user():
+        return redirect(url_for('signin'))
+
+    form = CreateEventForm()
+    csrf_token = csrf.generate_csrf()
+
+    if request.method == 'POST' and form.validate_on_submit():
+        title = form.title.data
+        description = form.description.data
+        image_file = form.image.data
+        venue = form.venue.data
+        date_time = form.date_time.data
+        slots_available = form.slots_available.data
+
+        event = None  # Initialize the event variable with a default value
+
+        if image_file:  # Check if file was uploaded
+            # Handle the file upload and save it to the server or database
+            filename = secure_filename(image_file.filename)
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            image_file.save(filepath)
+
+            with open(filepath, 'rb') as f:
+                image_data = f.read()
+
+            encoded_image = base64.b64encode(image_data).decode('utf-8')
+
+            event = Event(
+                title=title,
+                description=description,
+                image_file=filepath,  # Pass the image_file argument instead of image
+                venue=venue,
+                date_time=date_time,
+                slots_available=slots_available,
+                user=current_user()
+            )
+        else:
+            event = Event(
+                title=title,
+                description=description,
+                venue=venue,
+                date_time=date_time,
+                slots_available=slots_available,
+                user=current_user()
+            )
+        event.save()
+        return redirect(url_for('profile'))
+    else:
+        print(form.errors)  # Debugging statement to print validation errors
+        print(form.data)
+    return render_template('create_event.html', form=form,
+                           csrf_token=csrf_token)
 
 
 if __name__ == "__main__":

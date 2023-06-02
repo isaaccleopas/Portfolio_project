@@ -35,18 +35,20 @@ class BaseModel:
                 self.created_at = datetime.utcnow()
             if kwargs.get("id", None) is None:
                 self.id = str(uuid.uuid4())
-            else:
-                self.id = str(uuid.uuid4())
-                self.created_at = datetime.utcnow()
-                self.updated_at = self.created_at
+        else:
+            self.id = str(uuid.uuid4())
+            self.created_at = datetime.utcnow()
+            self.updated_at = self.created_at
 
     def __str__(self):
         """String representation of Base model"""
-        return "[{:s}] ({:s}) {}".format(self.__class__.__name__, self.id, self.__dict__)
+        return "[{:s}] ({:s}) {}".format(
+            self.__class__.__name__, self.id, self.__dict__
+        )
 
     def save(self):
         """Updates the attribute updated_at with the current datetime"""
-        updated_at = datetime.utcnow()
+        self.updated_at = datetime.utcnow()
         models.storage.new(self)
         models.storage.save()
 
@@ -61,7 +63,7 @@ class BaseModel:
         if "_sa_instance_state" in new_dict:
             del new_dict["_sa_instance_state"]
         if models.storage_t == "db":
-            if 'password' in new_dict:
+            if "password" in new_dict:
                 del new_dict["password"]
         return new_dict
 

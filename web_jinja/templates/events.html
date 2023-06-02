@@ -1,11 +1,13 @@
-<!-- events.html -->
-
 <!-- Event grid -->
 <div class="event-grid">
   {% for event in events %}
     <div class="event-item">
       <a href="/event/{{ event.id }}">
-        <img src="{{ event.image }}" alt="Event Image">
+        {% if event.image %}
+          <img src="{{ url_for('static', filename='images/' + event.image) }}" alt="Event Image">
+        {% else %}
+          <img src="{{ url_for('static', filename='images/default.jpg') }}" alt="Default Event Image">
+        {% endif %}
         <h3>{{ event.title }}</h3>
         <p>Date: {{ event.date_time }}</p>
         <p>Location: {{ event.venue }}</p>
@@ -19,6 +21,3 @@
   <input type="text" name="query" placeholder="Search...">
   <button type="submit">Search</button>
 </form>
-
-<!-- Show more button -->
-<a href="/more-events" class="btn">Show More</a>
