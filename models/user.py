@@ -5,8 +5,9 @@ from models.base_model import BaseModel, Base
 from sqlalchemy.orm import relationship
 from sqlalchemy import Column, String
 import hashlib
+from flask_login import UserMixin
 
-class User(BaseModel, Base):
+class User(UserMixin, BaseModel, Base):
     """Represents user attributes"""
     __tablename__ = "users"
     name = Column(String(128), nullable=False)
@@ -23,6 +24,10 @@ class User(BaseModel, Base):
     def validate_password(self, password):
         hashed_input_password = hashlib.md5(password.encode()).hexdigest()
         return self.password == hashed_input_password
+
+    def get_id(self):
+        """Returns the user ID as a string"""
+        return str(self.id)
 
     def __init__(self, *args, **kwargs):
         """Initializes user"""

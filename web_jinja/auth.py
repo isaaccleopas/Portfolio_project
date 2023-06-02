@@ -2,6 +2,7 @@
 """ Starts a Flash Web Application """
 import base64
 import requests
+from flask_login import login_required
 from flask import flash
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
@@ -11,6 +12,7 @@ from wtforms.validators import DataRequired, Email, EqualTo
 from models import storage
 from models.user import User
 import os
+from models.reservation import Reservation
 from models.event import Event
 from .forms import CreateEventForm
 from flask_wtf import csrf
@@ -78,12 +80,14 @@ def signin():
 
     return render_template('signin.html', form=form)
 
+
 def get_current_user():
     """Get current user"""
     user_id = session.get('user_id')
     if user_id:
         return storage.get(User, user_id)
     return None
+
 
 @app.route('/events')
 def display_events():
@@ -101,6 +105,7 @@ def display_events():
     else:
         return render_template('error.html', message='Failed to retrieve events')
 
+
 @app.route('/event/<event_id>')
 def view_event(event_id):
     """Retrieve the event from the API using the event_id"""
@@ -113,7 +118,6 @@ def view_event(event_id):
 
 
 @app.route('/reserve', methods=['POST'])
-@login_required
 def reserve_event():
     """Function that reserves a slot for a user"""
     user = get_current_user()
@@ -160,19 +164,10 @@ def profile():
     return redirect('/signin')
 
 
-def current_user():
-    """current user session"""
-    user_id = session.get('user_id')
-    if user_id:
-        user = storage.get(User, user_id)
-        return user
-    else:
-        return None
-
 @app.route('/create_event', methods=['GET', 'POST'])
 def create_event():
     """ Creating event"""
-    if not current_user():
+    if not current_user:
         return redirect(url_for('signin'))
 
     form = CreateEventForm()
@@ -222,8 +217,7 @@ def create_event():
     else:
         print(form.errors)  # Debugging statement to print validation errors
         print(form.data)
-    return render_template('create_event.html', form=form,
-                           csrf_token=csrf_token)
+    return render_template('create_event.html', form=form, csrf_token=csrf_token)
 
 
 if __name__ == "__main__":
