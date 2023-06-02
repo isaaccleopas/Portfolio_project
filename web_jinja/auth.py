@@ -78,6 +78,13 @@ def signin():
 
     return render_template('signin.html', form=form)
 
+def get_current_user():
+    """Get current user"""
+    user_id = session.get('user_id')
+    if user_id:
+        return storage.get(User, user_id)
+    return None
+
 @app.route('/events')
 def display_events():
     """Retrieve the first 9 events from the API"""
@@ -104,20 +111,24 @@ def view_event(event_id):
     else:
         return render_template('error.html', message='Failed to retrieve event')
 
+
 @app.route('/reserve', methods=['POST'])
 @login_required
 def reserve_event():
     """Function that reserves a slot for a user"""
+    user = get_current_user()
+    if not user:
+        return redirect(url_for('signin'))
+
     event_id = request.form.get('event_id')
 
     event = storage.get(Event, event_id)
 
     if event:
         if event.slots_available > 0:
-            user_id = current_user.id
+            user_id = user.id
             slots_reserved = 1
-            reservation = Reservation(user_id=user_id, event_id=event_id,
-                                      slots_reserved=slots_reserved)
+            reservation = Reservation(user_id=user_id, event_id=event_id, slots_reserved=slots_reserved)
             storage.new(reservation)
             storage.save()
             event.slots_available -= slots_reserved
