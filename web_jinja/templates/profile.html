@@ -6,5 +6,9 @@
     <h1>Welcome, {{ user.name }}</h1>
     <p>Email: {{ user.email }}</p>
     <a href="{{ url_for('signout') }}">Sign Out</a>
+    <br>
+    <a href="{{ url_for('create_event') }}">Create Event</a>
+    <br>
+    <a href="{{ url_for('display_events') }}">Display Events</a>
 </body>
 </html>

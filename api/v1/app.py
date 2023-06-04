@@ -3,14 +3,12 @@
 import os
 from flask import Flask, jsonify
 from flask_cors import CORS
-
+from web_jinja.auth import signin, signup, signout, profile
 from models import storage
 from api.v1.views import app_views
 
-app = Flask(__name__)
-"""Flask web application instances"""
-app_host = os.getenv('EVENT_API_HOST', '0.0.0.0')
-app_port = int(os.getenv('EVENT_API_PORT', '5000'))
+app = Flask(__name__, template_folder='templates')
+app.config['SECRET_KEY'] = '575ea3040135364ec552de39befd1add'
 app.url_map.strict_slashes = False
 app.register_blueprint(app_views)
 CORS(app, resources={r"/*": {"origins": "0.0.0.0"}})
@@ -32,13 +30,5 @@ def error_400(error):
         msg = error.description
     return jsonify(error=msg), 400
 
-
 if __name__ == '__main__':
-    app_host = os.getenv('EVENT_API_HOST', '0.0.0.0')
-    app_port = int(os.getenv('EVENT_API_PORT', '5000'))
-    app.run(
-        host=app_host,
-        port=app_port,
-        threaded=True
-    )
-
+    app.run(host='0.0.0.0', port=5000, threaded=True)

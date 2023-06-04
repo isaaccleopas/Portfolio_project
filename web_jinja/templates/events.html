@@ -11,6 +11,14 @@
         <h3>{{ event.title }}</h3>
         <p>Date: {{ event.date_time }}</p>
         <p>Location: {{ event.venue }}</p>
+        {% if event.has_passed %}
+          <a href="/events/{{ event.id }}/review">Review</a>
+        {% else %}
+          <form action="/reserve" method="POST">
+            <input type="hidden" name="event_id" value="{{ event.id }}">
+            <button type="submit" class="reserve-btn">Reserve</button>
+          </form>
+        {% endif %}
       </a>
     </div>
   {% endfor %}

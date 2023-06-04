@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Review Event</h1>
+  <form method="POST" action="{{ url_for('review_event', event_id=event.id) }}">
+    <div>
+      <label for="content">Your Review:</label>
+      <textarea id="content" name="content" rows="5" required></textarea>
+    </div>
+    <div>
+      <button type="submit">Submit Review</button>
+    </div>
+  </form>
+{% endblock %}

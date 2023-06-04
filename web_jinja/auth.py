@@ -2,6 +2,7 @@
 """ Starts a Flash Web Application """
 import base64
 import requests
+from datetime import datetime
 from flask_login import login_required
 from flask import flash
 from flask import Flask, render_template, request, redirect, url_for, session
@@ -13,6 +14,7 @@ from models import storage
 from models.user import User
 import os
 from models.reservation import Reservation
+from models.review import Review
 from models.event import Event
 from .forms import CreateEventForm
 from flask_wtf import csrf
@@ -74,6 +76,7 @@ def signin():
 
         if user and user.validate_password(password):
             session['user_id'] = user.id
+            login_user(user)
             return redirect(url_for('profile'))
         else:
             flash('Invalid email or password', 'error')
@@ -100,7 +103,8 @@ def display_events():
             if event['image'] is not None:
                 event['image_path'] = '/static/images/' + event['image']
             else:
-                event['image_path'] = '/static/images/default.jpg'  # Provide a default image p>
+                event['image_path'] = '/static/images/default.jpg'
+            event['has_passed'] = datetime.strptime(event['date_time'], '%a, %d %b %Y %H:%M:%S %Z') < datetime.now()
         return render_template('events.html', events=events)
     else:
         return render_template('error.html', message='Failed to retrieve events')
@@ -112,12 +116,14 @@ def view_event(event_id):
     response = requests.get(f'http://0.0.0.0:5000/api/v1/events/{event_id}')
     if response.status_code == 200:
         event = response.json()
+        event['has_passed'] = datetime.strptime(event['date_time'], '%a, %d %b %Y %H:%M:%S %Z') < datetime.now()
         return render_template('event_page.html', event=event)
     else:
         return render_template('error.html', message='Failed to retrieve event')
 
 
 @app.route('/reserve', methods=['POST'])
+@login_required
 def reserve_event():
     """Function that reserves a slot for a user"""
     user = get_current_user()
@@ -145,6 +151,7 @@ def reserve_event():
 
 
 @app.route('/signout')
+@login_required
 def signout():
     """signout function"""
     session.pop('user_id', None)
@@ -152,19 +159,18 @@ def signout():
 
 
 @app.route('/profile')
+@login_required
 def profile():
     """profile display"""
-    if 'user_id' in session:
-        user_id = session['user_id']
-        user = storage.get(User, user_id)
+    user = current_user
 
-        if user:
-            return render_template('profile.html', user=user)
+    if user:
+        return render_template('profile.html', user=user)
 
     return redirect('/signin')
 
-
 @app.route('/create_event', methods=['GET', 'POST'])
+@login_required
 def create_event():
     """ Creating event"""
     if not current_user:
@@ -181,10 +187,9 @@ def create_event():
         date_time = form.date_time.data
         slots_available = form.slots_available.data
 
-        event = None  # Initialize the event variable with a default value
+        event = None
 
-        if image_file:  # Check if file was uploaded
-            # Handle the file upload and save it to the server or database
+        if image_file:
             filename = secure_filename(image_file.filename)
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             image_file.save(filepath)
@@ -197,11 +202,11 @@ def create_event():
             event = Event(
                 title=title,
                 description=description,
-                image_file=filepath,  # Pass the image_file argument instead of image
+                image_file=filepath,
                 venue=venue,
                 date_time=date_time,
                 slots_available=slots_available,
-                user=current_user()
+                user=current_user
             )
         else:
             event = Event(
@@ -210,15 +215,36 @@ def create_event():
                 venue=venue,
                 date_time=date_time,
                 slots_available=slots_available,
-                user=current_user()
+                user=current_user
             )
         event.save()
         return redirect(url_for('profile'))
     else:
-        print(form.errors)  # Debugging statement to print validation errors
+        print(form.errors)
         print(form.data)
     return render_template('create_event.html', form=form, csrf_token=csrf_token)
 
+
+@app.route('/events/<event_id>/review', methods=['GET', 'POST'])
+@login_required
+def review_event(event_id):
+    if request.method == 'POST':
+        content = request.form.get('content')
+        if content:
+            user_id = current_user.id
+            review = Review(content=content, event_id=event_id, user_id=user_id)
+            storage.new(review)
+            storage.save()
+            flash('Review submitted successfully!')
+            return redirect(url_for('event_details', event_id=event_id))
+        else:
+            flash('Please enter a review before submitting.')
+
+    event = storage.get(Event, event_id)
+    if not event:
+        abort(404)
+
+    return render_template('review.html', event=event)
 
 if __name__ == "__main__":
     """Main Function"""

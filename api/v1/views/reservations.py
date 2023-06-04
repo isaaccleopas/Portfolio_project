@@ -61,6 +61,7 @@ def create_reservation():
     if not event_id or not user_id or not slots_reserved:
         abort(400, "Missing required fields")
     event = storage.get(Event, event_id)
+    user = storage.get(User, user_id)
     if not event:
         abort(404)
     user = storage.get(User, user_id)
