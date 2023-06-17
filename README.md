@@ -1,1 +1,1 @@
-Portfolio project by Isaac Cleopas and Ukwueze Pascaline
+Portfolio project by Isaac Cleopas 
