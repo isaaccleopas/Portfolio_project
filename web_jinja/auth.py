@@ -4,6 +4,7 @@ import base64
 import requests
 from datetime import datetime
 from flask_login import login_required
+from sqlalchemy.orm import joinedload
 from flask import flash
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
@@ -110,13 +111,24 @@ def display_events():
         return render_template('error.html', message='Failed to retrieve events')
 
 
-@app.route('/event/<event_id>')
+@app.route('/event/<event_id>', methods=['GET', 'POST'])
 def view_event(event_id):
-    """Retrieve the event from the API using the event_id"""
+    """Retrieve the event and reviews from the API using the event_id"""
     response = requests.get(f'http://0.0.0.0:5000/api/v1/events/{event_id}')
     if response.status_code == 200:
         event = response.json()
-        event['has_passed'] = datetime.strptime(event['date_time'], '%a, %d %b %Y %H:%M:%S %Z') < datetime.now()
+        event['has_passed'] = datetime.strptime(event['date_time'],
+                                                '%a, %d %b %Y %H:%M:%S %Z') < datetime.now()
+        if request.method == 'POST':
+            review = request.form.get('review')
+            response = requests.get(f'http://0.0.0.0:5000/api/v1/events/{event_id}')
+            if response.status_code == 200:
+                event = response.json()
+        event_with_reviews = models.Event.query.options(joinedload('reviews')).filter_by(id=event['id']).first()
+        if event_with_reviews:
+            event['reviews'] = [review.content for review in event_with_reviews.reviews]
+        else:
+            event['reviews'] = []
         return render_template('event_page.html', event=event)
     else:
         return render_template('error.html', message='Failed to retrieve event')
@@ -236,7 +248,7 @@ def review_event(event_id):
             storage.new(review)
             storage.save()
             flash('Review submitted successfully!')
-            return redirect(url_for('event_details', event_id=event_id))
+            return redirect(url_for('view_event', event_id=event_id))
         else:
             flash('Please enter a review before submitting.')
 

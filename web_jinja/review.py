@@ -13,7 +13,7 @@ def review_event(event_id):
             storage.new(review)
             storage.save()
             flash('Review submitted successfully!')
-            return redirect(url_for('event_details', event_id=event_id))
+            return redirect(url_for('view_event', event_id=event_id))
         else:
             flash('Please enter a review before submitting.')
 
