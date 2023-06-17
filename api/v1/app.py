@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """Contains a Flask web application API"""
 import os
+from flask import after_this_request
 from flask import Flask, jsonify
 from flask_cors import CORS
 from web_jinja.auth import signin, signup, signout, profile
@@ -21,6 +22,13 @@ def teardown_flask(exception):
 def error_404(error):
     """Handles the error code 404"""
     return jsonify(error='not found'), 404
+
+@app.after_request
+def add_cache_control(response):
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
 
 @app.errorhandler(400)
 def error_400(error):

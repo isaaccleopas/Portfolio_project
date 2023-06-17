@@ -20,6 +20,21 @@ def get_reviews():
     return jsonify([review.to_dict() for review in reviews])
 
 
+@app_views.route('/events/<event_id>/reviews', methods=['GET'], strict_slashes=False)
+def get_event_reviews(event_id):
+    """
+    Retrieves the list of reviews for a specific event.
+    """
+    event = storage.get(Event, event_id)
+    if not event:
+        abort(404)
+
+    reviews = storage.all(Review).values()
+    event_reviews = [review for review in reviews if review.event_id == event_id]
+
+    return jsonify([review.to_dict() for review in event_reviews])
+
+
 @app_views.route('/reviews/<review_id>', methods=['GET'],
                  strict_slashes=False)
 def get_review(review_id):

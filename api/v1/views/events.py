@@ -17,16 +17,15 @@ def get_events():
     return jsonify([event.to_dict() for event in events])
 
 
-@app_views.route('/events/<event_id>', methods=['GET'],
-                 strict_slashes=False)
+@app_views.route('/events/<event_id>', methods=['GET'], strict_slashes=False)
 def get_event(event_id):
     """
-    Retrieves an Event object.
+    Retrieves an Event object with associated reviews.
     """
     event = storage.get(Event, event_id)
     if not event:
         abort(404)
-    return jsonify(event.to_dict())
+    return jsonify(event.to_dict(include_reviews=True))
 
 
 @app_views.route('/events/<event_id>', methods=['DELETE'],

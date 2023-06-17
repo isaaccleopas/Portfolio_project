@@ -21,7 +21,21 @@ class Event(BaseModel, Base):
     reservations = relationship("Reservation", back_populates="event",
                            cascade="all, delete")
 
+    def to_dict(self, include_reviews=False):
+        event_dict = {
+            'id': self.id,
+            'title': self.title,
+            'description': self.description,
+            'image': self.image,
+            'venue': self.venue,
+            'date_time': self.date_time.isoformat(),
+            'slots_available': self.slots_available,
+            'reviews': [review.to_dict() for review in self.reviews]
+        }
+
+        return event_dict
+
     def __init__(self, *args, **kwargs):
-        image_file = kwargs.pop("image_file", None)  # Rename the argument to avoid conflict
+        image_file = kwargs.pop("image_file", None)
         super().__init__(*args, **kwargs)
         self.image = image_file

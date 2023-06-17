@@ -28,7 +28,11 @@
   <h2>Reviews</h2>
   <ul>
     {% for review in event.reviews %}
-      <li>{{ review }}</li>
+      <li>
+        <p>Content: {{ review.content }}</p>
+        <p>Date and Time: {{ review.created_at }}</p>
+        <p>User: {{ review.user.name }}</p>
+      </li>
     {% endfor %}
   </ul>
 {% endif %}

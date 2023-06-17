@@ -14,6 +14,20 @@ class Review(BaseModel, Base):
     event = relationship("Event", back_populates="reviews", overlaps="reviews")
     user = relationship("User", back_populates="reviews")
 
+    def to_dict(self):
+        """Returns a dictionary representation of the Review instance"""
+        review_dict = {
+            "id": self.id,
+            "content": self.content,
+            "created_at": self.created_at,
+            "event_id": self.event_id,
+            "user": {
+                "id": self.user.id,
+                "name": self.user.name
+            }
+        }
+        return review_dict
+
     def __init__(self, *args, **kwargs):
         """initializes Review"""
         super().__init__(*args, **kwargs)

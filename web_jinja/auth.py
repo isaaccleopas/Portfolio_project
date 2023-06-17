@@ -104,7 +104,7 @@ def display_events():
                 event['image_path'] = '/static/images/' + event['image']
             else:
                 event['image_path'] = '/static/images/default.jpg'
-            event['has_passed'] = datetime.strptime(event['date_time'], '%a, %d %b %Y %H:%M:%S %Z') < datetime.now()
+            event['has_passed'] = datetime.strptime(event['date_time'], '%Y-%m-%dT%H:%M:%S') < datetime.now()
         return render_template('events.html', events=events)
     else:
         return render_template('error.html', message='Failed to retrieve events')
@@ -116,7 +116,14 @@ def view_event(event_id):
     response = requests.get(f'http://0.0.0.0:5000/api/v1/events/{event_id}')
     if response.status_code == 200:
         event = response.json()
-        event['has_passed'] = datetime.strptime(event['date_time'], '%a, %d %b %Y %H:%M:%S %Z') < datetime.now()
+        event['has_passed'] = datetime.strptime(event['date_time'], '%Y-%m-%dT%H:%M:%S') < datetime.now()
+        reviews_response = requests.get(f'http://0.0.0.0:5000/api/v1/events/{event_id}/reviews')
+        if reviews_response.status_code == 200:
+            reviews = reviews_response.json()
+            event['reviews'] = reviews
+        else:
+            event['reviews'] = []
+
         return render_template('event_page.html', event=event)
     else:
         return render_template('error.html', message='Failed to retrieve event')
@@ -138,7 +145,8 @@ def reserve_event():
         if event.slots_available > 0:
             user_id = user.id
             slots_reserved = 1
-            reservation = Reservation(user_id=user_id, event_id=event_id, slots_reserved=slots_reserved)
+            reservation = Reservation(user_id=user_id, event_id=event_id,
+                                      slots_reserved=slots_reserved)
             storage.new(reservation)
             storage.save()
             event.slots_available -= slots_reserved
