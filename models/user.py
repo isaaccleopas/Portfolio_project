@@ -13,8 +13,7 @@ class User(UserMixin, BaseModel, Base):
     name = Column(String(128), nullable=False)
     email = Column(String(128), unique=True, nullable=False)
     password = Column(String(100), nullable=False)
-    google_id = Column(String(128), unique=True)
-    facebook_id = Column(String(128), unique=True)
+    firebase_uid = Column(String(128), unique=True)
     reviews = relationship("Review", back_populates="user")
     events = relationship("Event", back_populates="user",
                           cascade="all, delete")
@@ -38,13 +37,9 @@ class User(UserMixin, BaseModel, Base):
             m.update(str.encode(password))
             kwargs['password'] = m.hexdigest()
         if "google_token" in kwargs:
-            # Handle Google sign-up logic using Firebase
             google_token = kwargs["google_token"]
-            # Add your Firebase Google sign-up logic here
-            kwargs['google_token'] = google_token
+            self.google_token = google_token
         if "facebook_token" in kwargs:
-            # Handle Facebook sign-up logic using Firebase
             facebook_token = kwargs["facebook_token"]
-            # Add your Firebase Facebook sign-up logic here
-            kwargs['facebook_token'] = facebook_token
+            self.facebook_token = facebook_token
         super().__init__(*args, **kwargs)
