@@ -14,6 +14,8 @@ class User(UserMixin, BaseModel, Base):
     email = Column(String(128), unique=True, nullable=False)
     password = Column(String(100), nullable=False)
     firebase_uid = Column(String(128), unique=True)
+    google_token = Column(String(128))
+    facebook_token = Column(String(128))
     reviews = relationship("Review", back_populates="user")
     events = relationship("Event", back_populates="user",
                           cascade="all, delete")

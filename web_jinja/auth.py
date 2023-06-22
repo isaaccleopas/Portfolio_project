@@ -2,6 +2,8 @@
 """ Starts a Flash Web Application """
 import base64
 import requests
+import firebase_admin
+from firebase_admin import auth
 from datetime import datetime
 from flask_login import login_required
 from flask import flash
@@ -26,6 +28,7 @@ app.config['SECRET_KEY'] = '575ea3040135364ec552de39befd1add'
 app.config['UPLOAD_FOLDER'] = ''
 login_manager = LoginManager()
 login_manager.init_app(app)
+firebase_admin.initialize_app()
 
 
 @login_manager.user_loader
