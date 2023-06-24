@@ -4,6 +4,7 @@ import base64
 import requests
 import firebase_admin
 from firebase_admin import auth
+from firebase_admin import credentials
 from datetime import datetime
 from flask_login import login_required
 from flask import flash
@@ -28,8 +29,9 @@ app.config['SECRET_KEY'] = '575ea3040135364ec552de39befd1add'
 app.config['UPLOAD_FOLDER'] = ''
 login_manager = LoginManager()
 login_manager.init_app(app)
-firebase_admin.initialize_app()
-
+credentials_path = '/home/vagrant/credentials.json'
+cred = credentials.Certificate(credentials_path)
+firebase_admin.initialize_app(cred)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -48,7 +50,6 @@ class SigninForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Sign In')
 
-
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     """signup method"""
@@ -63,26 +64,45 @@ def signup():
             if existing_user:
                 return render_template('signup.html', error='User already exists.')
 
-            user = User(name=name, email=email, google_token=google_token)
-            storage.new(user)
+            user = auth.create_user(
+                email=email,
+                email_verified=True,
+                display_name=name,
+                password=password,
+                uid=existing_user.id
+            )
+
+            existing_user.google_token = google_token
             storage.save()
+            
         elif 'facebook_token' in session:
             facebook_token = session.pop('facebook_token', None)
             existing_user = storage.get_user_by_name(name)
             if existing_user:
                 return render_template('signup.html', error='User already exists.')
 
-            user = User(name=name, email=email, facebook_token=facebook_token)
-            storage.new(user)
+            user = auth.create_user(
+                email=email,
+                email_verified=True,
+                display_name=name,
+                password=password,
+                uid=existing_user.id
+            )
+
+            existing_user.facebook_token = facebook_token
             storage.save()
+
         else:
             existing_user = storage.get_user_by_email(email)
             if existing_user:
                 return render_template('signup.html', error='User already exists.')
 
-            user = User(name=name, email=email, password=password)
-            storage.new(user)
-            storage.save()
+            user = auth.create_user(
+                email=email,
+                email_verified=True,
+                display_name=name,
+                password=password
+            )
 
         return redirect(url_for('signin'))
 
