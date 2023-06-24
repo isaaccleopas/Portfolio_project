@@ -56,10 +56,33 @@ def signup():
         name = request.form.get('name')
         email = request.form.get('email')
         password = request.form.get('password')
+        
+        if 'google_token' in session:
+            google_token = session.pop('google_token', None)
+            existing_user = storage.get_user_by_email(email)
+            if existing_user:
+                return render_template('signup.html', error='User already exists.')
 
-        user = User(name=name, email=email, password=password)
-        storage.new(user)
-        storage.save()
+            user = User(name=name, email=email, google_token=google_token)
+            storage.new(user)
+            storage.save()
+        elif 'facebook_token' in session:
+            facebook_token = session.pop('facebook_token', None)
+            existing_user = storage.get_user_by_name(name)
+            if existing_user:
+                return render_template('signup.html', error='User already exists.')
+
+            user = User(name=name, email=email, facebook_token=facebook_token)
+            storage.new(user)
+            storage.save()
+        else:
+            existing_user = storage.get_user_by_email(email)
+            if existing_user:
+                return render_template('signup.html', error='User already exists.')
+
+            user = User(name=name, email=email, password=password)
+            storage.new(user)
+            storage.save()
 
         return redirect(url_for('signin'))
 

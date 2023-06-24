@@ -6,6 +6,7 @@
 <body>
     <h1>Signup</h1>
     <form method="POST" action="{{ url_for('signup') }}">
+        <input type="hidden" name="id_token" id="id_token" value="">
         <label for="name">Name:</label>
         <input type="text" id="name" name="name" required>
         <br>
@@ -27,15 +28,15 @@
         <button class="social-signin facebook" id='facebook-login'>Log in with Facebook</button>
     </div>
 
-    <script type="module">
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics.js";
-        import { getAuth, getRedirectResult, GoogleAuthProvider, FacebookAuthProvider, signInWithRedirect } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+    <!-- Include Firebase libraries using script tags -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-analytics.js"></script>
 
+    <script>
         // Your web app's Firebase configuration
         // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-        const firebaseConfig = {
+        var firebaseConfig = {
             apiKey: "AIzaSyDCUeyq8-leE1xN0w5N5cDe9qVInF7pVnE",
             authDomain: "events-hub-37537.firebaseapp.com",
             projectId: "events-hub-37537",
@@ -46,46 +47,57 @@
         };
 
         // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        const auth = getAuth(app);
-        const googleProvider = new GoogleAuthProvider(app);
-        const facebookProvider = new FacebookAuthProvider(app);
+        firebase.initializeApp(firebaseConfig);
+        var auth = firebase.auth();
+        var googleProvider = new firebase.auth.GoogleAuthProvider();
+        var facebookProvider = new firebase.auth.FacebookAuthProvider();
 
-        document.getElementById('google-login').addEventListener('click', (e) => {
-            signInWithRedirect(auth, googleProvider);
-        });
+        function signup() {
+            console.log("Entering signup function");
 
-        document.getElementById('facebook-login').addEventListener('click', (e) => {
-            signInWithRedirect(auth, facebookProvider);
-        });
-
-        getRedirectResult(auth)
-            .then((result) => {
-                if (result.credential) {
-                    // This gives you a Google/Facebook Access Token. You can use it to access Google/Facebook APIs.
-                    const credential = result.credential;
-                    const token = credential.accessToken;
-                }
-
-                // The signed-in user info.
-                const user = result.user;
-                // IdP data available using getAdditionalUserInfo(result)
-                // ...
-            })
-            .catch((error) => {
-                // Handle Errors here.
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                console.log("Error code:", errorCode);
-                console.log("Error message:", errorMessage);
-                // The email of the user's account used.
-                const email = error.customData.email;
-                // The AuthCredential type that was used.
-                const credential = error.credential;
-                // ...
+            document.getElementById('google-login').addEventListener('click', function(e) {
+                e.preventDefault();
+                auth.signInWithRedirect(googleProvider);
             });
+
+            document.getElementById('facebook-login').addEventListener('click', function(e) {
+                e.preventDefault();
+                auth.signInWithRedirect(facebookProvider);
+            });
+
+            auth.getRedirectResult()
+                .then(function(result) {
+                    if (result.credential) {
+                        // This gives you a Google/Facebook Access Token. You can use it to access Google/Facebook APIs.
+                        var credential = result.credential;
+                        var token = credential.accessToken;
+
+                        // Store the token in the session for sign-up processing
+                        sessionStorage.setItem('google_token', token); // For Google
+                        sessionStorage.setItem('facebook_token', token); // For Facebook
+                    }
+                    // The signed-in user info.
+                    var user = result.user;
+                    // IdP data available using getAdditionalUserInfo(result)
+                    // ...
+                })
+                .catch(function(error) {
+                    // Handle Errors here.
+                    // ...
+
+                    var errorCode = error.code;
+                    var errorMessage = error.message;
+                    console.log("Error code:", errorCode);
+                    console.log("Error message:", errorMessage);
+                    // The email of the user's account used.
+                    var email = error.customData.email;
+                    // The AuthCredential type that was used.
+                    var credential = error.credential;
+                    // ...
+                });
+        }
+
+        signup();
     </script>
-    
 </body>
 </html>

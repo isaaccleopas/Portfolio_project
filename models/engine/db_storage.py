@@ -86,7 +86,6 @@ class DBStorage:
         objects = self.all(cls)
         return objects.get(key, None)
 
-
     def count(self, cls=None):
         """
         Returns the number of objects in storage matching the given class name.
@@ -96,3 +95,25 @@ class DBStorage:
             if cls is None or cls is clss or cls is clss.__name__:
                 nobjects += len(self.__session.query(clss).all())
         return nobjects
+
+    def get_user_by_email(self, email):
+        """
+        Retrieve a user object based on the email address.
+        Returns None if the user is not found.
+        """
+        try:
+            user = self.__session.query(User).filter_by(email=email).one()
+            return user
+        except NoResultFound:
+            return None
+
+    def get_user_by_name(self, name):
+        """
+        Retrieve a user object based on the name.
+        Returns None if the user is not found.
+        """
+        try:
+            user = self.__session.query(User).filter_by(name=name).one()
+            return user
+        except NoResultFound:
+            return None
