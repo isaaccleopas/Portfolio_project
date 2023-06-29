@@ -8,22 +8,6 @@ app = Flask(__name__, template_folder='templates')
 app.config['SECRET_KEY'] = os.environ.get('MY_APP_SECRET_KEY')
 app.url_map.strict_slashes = False
 CORS(app, resources={r"/*": {"origins": "0.0.0.0"}})
-app.register_blueprint(routes_bp)
-
-from web_jinja.routes import routes_bp
-
-@app.errorhandler(404)
-def error_404(error):
-    """Handles the error code 404"""
-    return jsonify(error='not found'), 404
-
-@app.errorhandler(400)
-def error_400(error):
-    """Handles the error code 400"""
-    msg = "Bad request"
-    if isinstance(error, Exception) and hasattr(error, 'description'):
-        msg = error.description
-    return jsonify(error=msg), 400
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000, threaded=True)

@@ -2,7 +2,6 @@
 """ Starts a Flash Web Application """
 import base64
 import requests
-from web_jinja import routes_bp
 from datetime import datetime
 from flask_login import current_user as flask_login_current_user
 from flask import flash, Blueprint, render_template, request, redirect, url_for, session
@@ -235,3 +234,6 @@ def signout():
     """signout function"""
     session.pop('user_id', None)
     return redirect('/signin')
+
+from api.v1.app import app
+app.register_blueprint(routes_bp)
