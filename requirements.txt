@@ -10,6 +10,7 @@ Flask-Login
 Flask-SQLAlchemy
 Flask-WTF==1.1.1
 greenlet==2.0.2
+gunicorn
 idna==3.4
 importlib-metadata==6.7.0
 itsdangerous==2.1.2
