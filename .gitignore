@@ -1,0 +1,6 @@
+__pycahe__/
+*.swp
+venv/
+alembic/
+alembic.ini
+
