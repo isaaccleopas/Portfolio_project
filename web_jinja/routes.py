@@ -2,10 +2,12 @@
 """ Starts a Flash Web Application """
 import base64
 import requests
+from flask import current_app
 from datetime import datetime
+from flask import flash
 from flask_login import current_user as flask_login_current_user
-from flask import flash, Blueprint, render_template, request, redirect, url_for, session
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from flask import Blueprint, render_template, request, redirect, url_for, session, abort
+from flask_login import login_user, login_required, current_user, logout_user, LoginManager
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Email, EqualTo
@@ -21,7 +23,8 @@ from werkzeug.utils import secure_filename
 
 routes_bp = Blueprint('routes', __name__)
 login_manager = LoginManager()
-login_manager.init_app(routes_bp)
+
+from app import login_manager
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -33,7 +36,7 @@ class SigninForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Sign In')
 
-@app.route('/signup', methods=['GET', 'POST'])
+@routes_bp.route('/signup', methods=['GET', 'POST'])
 def signup():
     """signup method"""
     if request.method == 'POST':
@@ -45,11 +48,11 @@ def signup():
         storage.new(user)
         storage.save()
 
-        return redirect(url_for('signin'))
+        return redirect(url_for('routes.signin'))
 
     return render_template('signup.html')
 
-@app.route('/signin', methods=['GET', 'POST'])
+@routes_bp.route('/signin', methods=['GET', 'POST'])
 def signin():
     """signin method"""
     form = SigninForm()
@@ -63,7 +66,7 @@ def signin():
         if user and user.validate_password(password):
             session['user_id'] = user.id
             login_user(user)
-            return redirect(url_for('profile'))
+            return redirect(url_for('routes.profile'))
         else:
             flash('Invalid email or password', 'error')
 
@@ -77,12 +80,12 @@ def get_current_user():
         return storage.get(User, user_id)
     return None
 
-@app.route('/create_event', methods=['GET', 'POST'])
+@routes_bp.route('/create_event', methods=['GET', 'POST'])
 @login_required
 def create_event():
     """ Creating event"""
     if not flask_login_current_user:
-        return redirect(url_for('signin'))
+        return redirect(url_for('routes.signin'))
 
     form = CreateEventForm()
     csrf_token = csrf.generate_csrf()
@@ -99,7 +102,7 @@ def create_event():
 
         if image_file:
             filename = secure_filename(image_file.filename)
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
             image_file.save(filepath)
 
             with open(filepath, 'rb') as f:
@@ -132,43 +135,53 @@ def create_event():
         print(form.data)
     return render_template('create_event.html', form=form, csrf_token=csrf_token)
 
-@app.route('/event/<event_id>')
+@routes_bp.route('/event/<event_id>')
 def view_event(event_id):
-    """Retrieve the event from the API using the event_id"""
-    response = requests.get(f'http://0.0.0.0:5000/api/v1/events/{event_id}')
-    if response.status_code == 200:
-        event = response.json()
-        event['has_passed'] = datetime.strptime(event['date_time'], '%Y-%m-%dT%H:%M:%S') < datetime.now()
-        reviews_response = requests.get(f'http://0.0.0.0:5000/api/v1/events/{event_id}/reviews')
-        if reviews_response.status_code == 200:
-            reviews = reviews_response.json()
-            event['reviews'] = reviews
-        else:
-            event['reviews'] = []
-
-        return render_template('event_page.html', event=event)
+    """Retrieve the event from the local database using the event_id"""
+    event = storage.get(Event, event_id)
+    if event:
+        event_data = {
+            'title': event.title,
+            'description': event.description,
+            'image': event.image,
+            'venue': event.venue,
+            'date_time': event.date_time,
+            'slots_available': event.slots_available,
+            'has_passed': event.date_time < datetime.now(),
+            'reviews': []
+        }
+        reviews = storage.get_event_reviews(event_id)
+        if reviews:
+            event_data['reviews'] = reviews
+        return render_template('event_page.html', event=event_data)
     else:
         return render_template('error.html', message='Failed to retrieve event')
 
-@app.route('/events')
-def display_events():
-    """Retrieve the first 9 events from the API"""
-    response = requests.get('http://0.0.0.0:5000/api/v1/events')
-    if response.status_code == 200:
-        events = response.json()
 
+@routes_bp.route('/events')
+def display_events():
+    """Retrieve all events from the local database"""
+    events = storage.get_events()
+    if events:
+        event_list = []
         for event in events:
-            if event['image'] is not None:
-                event['image_path'] = '/static/images/' + event['image']
-            else:
-                event['image_path'] = '/static/images/default.jpg'
-            event['has_passed'] = datetime.strptime(event['date_time'], '%Y-%m-%dT%H:%M:%S') < datetime.now()
-        return render_template('events.html', events=events)
+            event_data = {
+                'title': event.title,
+                'description': event.description,
+                'image': event.image,
+                'venue': event.venue,
+                'date_time': event.date_time,
+                'slots_available': event.slots_available,
+                'image_path': '/static/images/' + event.image if event.image else '/static/images/default.jpg',
+                'has_passed': event.date_time < datetime.now()
+            }
+            event_list.append(event_data)
+        return render_template('events.html', events=event_list)
     else:
         return render_template('error.html', message='Failed to retrieve events')
 
 
-@app.route('/events/<event_id>/review', methods=['GET', 'POST'])
+@routes_bp.route('/events/<event_id>/review', methods=['GET', 'POST'])
 @login_required
 def review_event(event_id):
     if request.method == 'POST':
@@ -179,7 +192,7 @@ def review_event(event_id):
             storage.new(review)
             storage.save()
             flash('Review submitted successfully!')
-            return redirect(url_for('view_event', event_id=event_id))
+            return redirect(url_for('routes.view_event', event_id=event_id))
         else:
             flash('Please enter a review before submitting.')
 
@@ -189,13 +202,13 @@ def review_event(event_id):
 
     return render_template('review.html', event=event)
 
-@app.route('/reserve', methods=['POST'])
+@routes_bp.route('/reserve', methods=['POST'])
 @login_required
 def reserve_event():
     """Function that reserves a slot for a user"""
     user = get_current_user()
     if not user:
-        return redirect(url_for('signin'))
+        return redirect(url_for('routes.signin'))
 
     event_id = request.form.get('event_id')
 
@@ -217,7 +230,7 @@ def reserve_event():
     else:
         return render_template('error.html', message='Failed to retrieve event')
 
-@app.route('/profile')
+@routes_bp.route('/profile')
 @login_required
 def profile():
     """profile display"""
@@ -228,12 +241,9 @@ def profile():
 
     return redirect('/signin')
 
-@app.route('/signout')
+@routes_bp.route('/signout')
 @login_required
 def signout():
     """signout function"""
     session.pop('user_id', None)
     return redirect('/signin')
-
-from api.v1.app import app
-app.register_blueprint(routes_bp)

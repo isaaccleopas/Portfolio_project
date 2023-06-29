@@ -2,7 +2,7 @@
 
 {% block content %}
   <h1>Create Event</h1>
-  <form method="POST" action="{{ url_for('create_event') }}" enctype="multipart/form-data">
+  <form method="POST" action="{{ url_for('routes.create_event') }}" enctype="multipart/form-data">
     {{ form.csrf_token }}
 
     {{ form.title.label }}

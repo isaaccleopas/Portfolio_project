@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 """Contains event class"""
+import json
 from sqlalchemy import Column, String, LargeBinary, DateTime, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 from models.base_model import BaseModel, Base

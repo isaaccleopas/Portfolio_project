@@ -32,8 +32,6 @@ class DBStorage:
                                              os.environ.get('EVENT_MYSQL_PWD'),
                                              os.environ.get('EVENT_MYSQL_HOST'),
                                              os.environ.get('EVENT_MYSQL_DB')))
-        if EVENT_ENV == "test":
-            Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
         """Query the current database"""
@@ -46,6 +44,12 @@ class DBStorage:
             key = '{}.{}'.format(type(obj).__name__, obj.id)
             objects[key] = obj
         return objects
+    
+    def get_events(self):
+        """Retrieve all events from the local database"""
+        events = self.all(Event).values()
+        sorted_events = sorted(events, key=lambda e: e.date_time)
+        return sorted_events
 
     def new(self, obj):
         """Add the object to the current database session"""
