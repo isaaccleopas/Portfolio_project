@@ -23,7 +23,8 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('MY_APP_SECRET_KEY')
-app.config['UPLOAD_FOLDER'] = ''
+app.config['UPLOAD_FOLDER'] = 'web_jinja/static/images'
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -249,4 +250,4 @@ def signout():
 
 if __name__ == "__main__":
     """Main Function"""
-    app.run(host='0.0.0.0', port=5001)
+    app.run(debug=True, host='0.0.0.0', port=5001)
