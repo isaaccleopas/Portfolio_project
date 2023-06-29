@@ -8,6 +8,9 @@ app = Flask(__name__, template_folder='templates')
 app.config['SECRET_KEY'] = os.environ.get('MY_APP_SECRET_KEY')
 app.url_map.strict_slashes = False
 CORS(app, resources={r"/*": {"origins": "0.0.0.0"}})
+app.register_blueprint(routes_bp)
+
+from web_jinja.routes import routes_bp
 
 @app.errorhandler(404)
 def error_404(error):

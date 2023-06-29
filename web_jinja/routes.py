@@ -2,8 +2,9 @@
 """ Starts a Flash Web Application """
 import base64
 import requests
-from api.v1.app import login_manager
+from web_jinja import routes_bp
 from datetime import datetime
+from flask_login import current_user as flask_login_current_user
 from flask import flash, Blueprint, render_template, request, redirect, url_for, session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
@@ -27,12 +28,6 @@ login_manager.init_app(routes_bp)
 def load_user(user_id):
     """Loads the user object based on the user_id"""
     return storage.get(User, user_id)
-
-@app.teardown_appcontext
-def close_db(error):
-    """ Remove the current SQLAlchemy Session """
-    storage.close()
-
 
 class SigninForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
