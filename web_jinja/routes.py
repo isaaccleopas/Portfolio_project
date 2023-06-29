@@ -2,10 +2,9 @@
 """ Starts a Flash Web Application """
 import base64
 import requests
+from api.v1.app import login_manager
 from datetime import datetime
-from flask_login import login_required, current_user as flask_login_current_user
-from flask import flash
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import flash, Blueprint, render_template, request, redirect, url_for, session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
@@ -20,19 +19,14 @@ from models.event import Event
 from flask_wtf import csrf
 from werkzeug.utils import secure_filename
 
-
-app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('MY_APP_SECRET_KEY')
-app.config['UPLOAD_FOLDER'] = 'web_jinja/static/images'
-app.config['TEMPLATES_AUTO_RELOAD'] = True
+routes_bp = Blueprint('routes', __name__)
 login_manager = LoginManager()
-login_manager.init_app(app)
+login_manager.init_app(routes_bp)
 
 @login_manager.user_loader
 def load_user(user_id):
     """Loads the user object based on the user_id"""
     return storage.get(User, user_id)
-
 
 @app.teardown_appcontext
 def close_db(error):
@@ -246,8 +240,3 @@ def signout():
     """signout function"""
     session.pop('user_id', None)
     return redirect('/signin')
-
-
-if __name__ == "__main__":
-    """Main Function"""
-    app.run(debug=True, host='0.0.0.0', port=5001)
