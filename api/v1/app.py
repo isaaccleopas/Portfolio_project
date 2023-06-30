@@ -5,7 +5,8 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.getenv('MY_APP_SECRET_KEY')
+SECRET_KEY = os.urandom(32)
+app.config['SECRET_KEY'] = SECRET_KEY
 app.url_map.strict_slashes = False
 CORS(app, resources={r"/*": {"origins": "0.0.0.0"}})
 
