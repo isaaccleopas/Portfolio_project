@@ -3,8 +3,10 @@
 import os
 from flask import Flask, jsonify
 from flask_cors import CORS
+from api.v1.views import app_views
 
 app = Flask(__name__)
+app.register_blueprint(app_views)
 SECRET_KEY = os.urandom(32)
 app.config['SECRET_KEY'] = SECRET_KEY
 app.url_map.strict_slashes = False
