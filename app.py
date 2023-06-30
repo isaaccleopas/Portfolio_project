@@ -5,8 +5,8 @@ from flask import Flask
 from flask_cors import CORS
 from flask_login import LoginManager
 
-app = Flask(__name__, template_folder='web_jinja/Templates')
-app.config['SECRET_KEY'] = os.environ.get('MY_APP_SECRET_KEY')
+app = Flask(__name__, template_folder='web_jinja/templates')
+app.config['SECRET_KEY'] = os.getenv('MY_APP_SECRET_KEY')
 app.config['UPLOAD_FOLDER'] = 'web_jinja/static/images'
 app.url_map.strict_slashes = False
 

@@ -137,49 +137,38 @@ def create_event():
 
 @routes_bp.route('/event/<event_id>')
 def view_event(event_id):
-    """Retrieve the event from the local database using the event_id"""
-    event = storage.get(Event, event_id)
-    if event:
-        event_data = {
-            'title': event.title,
-            'description': event.description,
-            'image': event.image,
-            'venue': event.venue,
-            'date_time': event.date_time,
-            'slots_available': event.slots_available,
-            'has_passed': event.date_time < datetime.now(),
-            'reviews': []
-        }
-        reviews = storage.get_event_reviews(event_id)
-        if reviews:
-            event_data['reviews'] = reviews
-        return render_template('event_page.html', event=event_data)
+    """Retrieve the event from the API using the event_id"""
+    response = requests.get(f'http://0.0.0.0:5000/api/v1/events/{event_id}')
+    if response.status_code == 200:
+        event = response.json()
+        event['has_passed'] = datetime.strptime(event['date_time'], '%Y-%m-%dT%H:%M:%S') < datetime.now()
+        reviews_response = requests.get(f'http://0.0.0.0:5000/api/v1/events/{event_id}/reviews')
+        if reviews_response.status_code == 200:
+            reviews = reviews_response.json()
+            event['reviews'] = reviews
+        else:
+            event['reviews'] = []
+
+        return render_template('event_page.html', event=event)
     else:
         return render_template('error.html', message='Failed to retrieve event')
 
-
 @routes_bp.route('/events')
 def display_events():
-    """Retrieve all events from the local database"""
-    events = storage.get_events()
-    if events:
-        event_list = []
+    """Retrieve the first 9 events from the API"""
+    response = requests.get('http://0.0.0.0:5000/api/v1/events')
+    if response.status_code == 200:
+        events = response.json()
+
         for event in events:
-            event_data = {
-                'title': event.title,
-                'description': event.description,
-                'image': event.image,
-                'venue': event.venue,
-                'date_time': event.date_time,
-                'slots_available': event.slots_available,
-                'image_path': '/static/images/' + event.image if event.image else '/static/images/default.jpg',
-                'has_passed': event.date_time < datetime.now()
-            }
-            event_list.append(event_data)
-        return render_template('events.html', events=event_list)
+            if event['image'] is not None:
+                event['image_path'] = '/static/images/' + event['image']
+            else:
+                event['image_path'] = '/static/images/default.jpg'
+            event['has_passed'] = datetime.strptime(event['date_time'], '%Y-%m-%dT%H:%M:%S') < datetime.now()
+        return render_template('events.html', events=events)
     else:
         return render_template('error.html', message='Failed to retrieve events')
-
 
 @routes_bp.route('/events/<event_id>/review', methods=['GET', 'POST'])
 @login_required
