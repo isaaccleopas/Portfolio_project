@@ -28,18 +28,15 @@ class DBStorage:
 
     def __init__(self):
         """Instantiate a DBStorage object"""
-        EVENT_MYSQL_USER = 'event_dev'
-        EVENT_MYSQL_PWD = 'event_dev_pwd'
-        EVENT_MYSQL_HOST = 'localhost'
-        EVENT_MYSQL_DB = 'event_dev_db'
-        EVENT_ENV = 'dev'
-        self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'.
-                                      format(EVENT_MYSQL_USER,
-                                             EVENT_MYSQL_PWD,
-                                             EVENT_MYSQL_HOST,
-                                             EVENT_MYSQL_DB))
-        if EVENT_ENV == "test":
-            Base.metadata.drop_all(self.__engine)
+        mysql_user = os.getenv("MYSQL_USER", "event_dev")
+        mysql_password = os.getenv("MYSQL_PASSWORD", "event_dev_pwd")
+        mysql_host = os.getenv("MYSQL_HOST", "localhost")
+        mysql_db = os.getenv("MYSQL_DB", "event_dev_db")
+
+        self.__engine = create_engine(f"mysql+mysqldb://{mysql_user}:{mysql_password}@{mysql_host}/{mysql_db}")
+        
+        if os.getenv("EVENT_ENV", "dev") == "dev":
+            Base.metadata.create_all(self.__engine)
 
     def all(self, cls=None):
         """Query the current database"""
