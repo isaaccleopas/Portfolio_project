@@ -29,15 +29,17 @@ class DBStorage:
 
     def __init__(self):
         """Instantiate a DBStorage object"""
-        pg_user = os.getenv("POSTGRES_USER", "event_dev")
-        pg_password = os.getenv("POSTGRES_PASSWORD", "om2qPnXPOKJaefr24P1BQyCyXTi7vKE8")
-        pg_host = os.getenv("POSTGRES_HOST", "dpg-cig531lgkuvojjfkjbm0-a")
-        pg_db = os.getenv("POSTGRES_DB", "event_dev_db")
-
-        self.__engine = create_engine(f"postgresql+psycopg2://{pg_user}:{pg_password}@{pg_host}/{pg_db}")
+        internal_db_url = "postgres://event_dev:om2qPnXPOKJaefr24P1BQyCyXTi7vKE8@dpg-cig531lgkuvojjfkjbm0-a/event_dev_db"
+        external_db_url = "postgres://event_dev:om2qPnXPOKJaefr24P1BQyCyXTi7vKE8@dpg-cig531lgkuvojjfkjbm0-a.singapore-postgres.render.com/event_dev_db"
         
         if os.getenv("EVENT_ENV", "dev") == "dev":
-            Base.metadata.create_all(self.__engine)
+            self.__engine = create_engine(internal_db_url)
+        else:
+            self.__engine = create_engine(external_db_url)
+
+        Base.metadata.create_all(self.__engine)
+        Session = sessionmaker(bind=self.__engine)
+        self.__session = Session()
 
     def all(self, cls=None):
         """Query the current database"""
