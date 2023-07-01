@@ -5,12 +5,12 @@ import requests
 from flask import current_app
 from datetime import datetime
 from flask import flash
-from flask_login import current_user as flask_login_current_user
 from flask import Blueprint, render_template, request, redirect, url_for, session, abort
 from flask_login import login_user, login_required, current_user, logout_user, LoginManager
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Email, EqualTo
+from models.engine.db_storage import DBStorage
 from models import storage
 from models.user import User
 import os
@@ -21,11 +21,12 @@ from models.event import Event
 from flask_wtf import csrf
 from werkzeug.utils import secure_filename
 
+storage = DBStorage()
+storage.reload()
+
 routes_bp = Blueprint('routes', __name__)
-login_manager = LoginManager()
 
 from app import login_manager
-
 @login_manager.user_loader
 def load_user(user_id):
     """Loads the user object based on the user_id"""
@@ -162,7 +163,7 @@ def display_events():
 
         for event in events:
             if event['image'] is not None:
-                event['image_path'] = '/static/images/' + event['image']
+                event['image_path'] = 'web_jinja/static/images' + event['image']
             else:
                 event['image_path'] = '/static/images/default.jpg'
             event['has_passed'] = datetime.strptime(event['date_time'], '%Y-%m-%dT%H:%M:%S') < datetime.now()

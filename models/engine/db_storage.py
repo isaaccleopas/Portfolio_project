@@ -8,6 +8,7 @@ from models.event import Event
 from models.reservation import Reservation
 from models.review import Review
 from models.user import User
+from os import getenv
 import os
 import sqlalchemy
 from sqlalchemy import create_engine
@@ -27,11 +28,18 @@ class DBStorage:
 
     def __init__(self):
         """Instantiate a DBStorage object"""
+        EVENT_MYSQL_USER = 'event_dev'
+        EVENT_MYSQL_PWD = 'event_dev_pwd'
+        EVENT_MYSQL_HOST = 'localhost'
+        EVENT_MYSQL_DB = 'event_dev_db'
+        EVENT_ENV = 'dev'
         self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'.
-                                      format(os.environ.get('EVENT_MYSQL_USER'),
-                                             os.environ.get('EVENT_MYSQL_PWD'),
-                                             os.environ.get('EVENT_MYSQL_HOST'),
-                                             os.environ.get('EVENT_MYSQL_DB')))
+                                      format(EVENT_MYSQL_USER,
+                                             EVENT_MYSQL_PWD,
+                                             EVENT_MYSQL_HOST,
+                                             EVENT_MYSQL_DB))
+        if EVENT_ENV == "test":
+            Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
         """Query the current database"""
@@ -45,12 +53,6 @@ class DBStorage:
             objects[key] = obj
         return objects
     
-    def get_events(self):
-        """Retrieve all events from the local database"""
-        events = self.all(Event).values()
-        sorted_events = sorted(events, key=lambda e: e.date_time)
-        return sorted_events
-
     def new(self, obj):
         """Add the object to the current database session"""
         self.__session.add(obj)
