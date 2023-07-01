@@ -10,6 +10,7 @@ from models.review import Review
 from models.user import User
 from os import getenv
 import os
+import psycopg2
 import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -22,18 +23,18 @@ Base = declarative_base()
 classes = {"Event": Event, "BaseModel": BaseModel, "Reservation": Reservation, "Review": Review, "User": User}
 
 class DBStorage:
-    """Interacts with the MySQL database"""
+    """Interacts with the PostgreSQL database"""
     __engine = None
     __session = None
 
     def __init__(self):
         """Instantiate a DBStorage object"""
-        mysql_user = os.getenv("MYSQL_USER", "event_dev")
-        mysql_password = os.getenv("MYSQL_PASSWORD", "event_dev_pwd")
-        mysql_host = os.getenv("MYSQL_HOST", "localhost")
-        mysql_db = os.getenv("MYSQL_DB", "event_dev_db")
+        pg_user = os.getenv("POSTGRES_USER", "event_dev")
+        pg_password = os.getenv("POSTGRES_PASSWORD", "om2qPnXPOKJaefr24P1BQyCyXTi7vKE8")
+        pg_host = os.getenv("POSTGRES_HOST", "dpg-cig531lgkuvojjfkjbm0-a")
+        pg_db = os.getenv("POSTGRES_DB", "event_dev_db")
 
-        self.__engine = create_engine(f"mysql+mysqldb://{mysql_user}:{mysql_password}@{mysql_host}/{mysql_db}")
+        self.__engine = create_engine(f"postgresql+psycopg2://{pg_user}:{pg_password}@{pg_host}/{pg_db}")
         
         if os.getenv("EVENT_ENV", "dev") == "dev":
             Base.metadata.create_all(self.__engine)
