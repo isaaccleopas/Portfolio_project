@@ -29,9 +29,9 @@ class DBStorage:
 
     def __init__(self):
         """Instantiate a DBStorage object"""
-        internal_db_url = "POSGRES_INTERNAL_URL"
-        external_db_url = "POSGRES_EXTERNAL_URL"
-        
+        internal_db_url = os.getenv("POSGRES_INTERNAL_URL")
+        external_db_url = os.getenv("POSGRES_EXTERNAL_URL")
+
         if os.getenv("EVENT_ENV", "dev") == "dev":
             self.__engine = create_engine(internal_db_url)
         else:
