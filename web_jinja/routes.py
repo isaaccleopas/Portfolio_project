@@ -6,6 +6,7 @@ from flask import current_app
 from datetime import datetime
 from flask import flash
 from flask import Blueprint, render_template, request, redirect, url_for, session, abort
+from flask_login import current_user as flask_login_current_user
 from flask_login import login_user, login_required, current_user, logout_user, LoginManager
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField

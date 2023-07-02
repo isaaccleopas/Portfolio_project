@@ -1,12 +1,10 @@
-import os
-import subprocess
+from models.base_model import BaseModel, Base
+from models.event import Event
+from models.reservation import Reservation
+from models.review import Review
+from models.user import User
+from models.engine.db_storage import DBStorage
 
-if __name__ == "__main__":
-    web_app_module = "app:app"
-    api_app_module = "api.v1.app:app"
-    
-    web_app_command = f"gunicorn --bind 0.0.0.0:5001 {web_app_module}"
-    api_app_command = f"gunicorn --bind 0.0.0.0:5000 {api_app_module}"
-    
-    subprocess.run(web_app_command, shell=True)
-    subprocess.run(api_app_command, shell=True)
+storage = DBStorage()
+Base.metadata.create_all(storage._DBStorage__engine)
+storage.all(User)
