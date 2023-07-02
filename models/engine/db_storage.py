@@ -12,7 +12,7 @@ from os import getenv
 import os
 import psycopg2
 import sqlalchemy
-import sqlalchemy.dialects.postgres
+import sqlalchemy.dialects.postgresql
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -30,12 +30,7 @@ class DBStorage:
 
     def __init__(self):
         """Instantiate a DBStorage object"""
-        external_db_url = os.environ.get("DATABASE_URL")
-
-        if os.getenv("EVENT_ENV", "dev") == "dev":
-            self.__engine = create_engine(internal_db_url)
-        else:
-            self.__engine = create_engine(external_db_url)
+        self.__engine = create_engine(os.environ.get("DATABASE_URL"))
 
         Base.metadata.create_all(self.__engine)
         Session = sessionmaker(bind=self.__engine)
