@@ -12,6 +12,7 @@ from os import getenv
 import os
 import psycopg2
 import sqlalchemy
+import sqlalchemy.dialects.postgres
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -29,8 +30,7 @@ class DBStorage:
 
     def __init__(self):
         """Instantiate a DBStorage object"""
-        internal_db_url = os.getenv("POSGRES_INTERNAL_URL")
-        external_db_url = os.getenv("POSGRES_EXTERNAL_URL")
+        external_db_url = os.environ.get("DATABASE_URL")
 
         if os.getenv("EVENT_ENV", "dev") == "dev":
             self.__engine = create_engine(internal_db_url)

@@ -9,7 +9,7 @@ app = Flask(__name__, template_folder='web_jinja/templates')
 SECRET_KEY = os.urandom(32)
 app.config['SECRET_KEY'] = SECRET_KEY
 app.config['UPLOAD_FOLDER'] = 'web_jinja/static/images'
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgres://event_dev:om2qPnXPOKJaefr24P1BQyCyXTi7vKE8@dpg-cig531lgkuvojjfkjbm0-a/event_dev_db"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
 app.url_map.strict_slashes = False
 
 CORS(app, resources={r"/*": {"origins": "0.0.0.0"}})
