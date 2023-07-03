@@ -3,10 +3,10 @@
 This module handles all default RestFul API actions for Users.
 """
 from flask import abort, jsonify, request
-from models import storage
+from models.engine.db_storage import DBStorage
 from models.user import User
 from api.v1.views import app_views
-
+storage = DBStorage()
 
 @app_views.route('/users', methods=['GET'], strict_slashes=False)
 def get_users():

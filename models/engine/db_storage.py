@@ -50,16 +50,20 @@ class DBStorage:
     
     def new(self, obj):
         """Add the object to the current database session"""
-        self.__session.add(obj)
+        if not self.__session.object_session(obj):
+            self.__session.add(obj)
 
     def save(self):
         """Commit all changes of the current database session"""
         try:
+            self.reload()
             self.__session.commit()
         except SQLAlchemyError as e:
             print("Error occurred during save:", str(e))
             self.__session.rollback()
             raise
+        finally:
+            self.close()
 
     def delete(self, obj=None):
         """Delete from the current database session obj if not None"""
@@ -68,9 +72,7 @@ class DBStorage:
 
     def reload(self):
         """Reload data from the database"""
-        Base.metadata.create_all(self.__engine)
-        Session = sessionmaker(bind=self.__engine)
-        self.__session = Session()
+        self.__session.expire_all()
 
     def close(self):
         """Close the session"""

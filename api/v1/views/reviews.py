@@ -4,12 +4,12 @@ This module handles all default RestFul API actions for Reviews.
 """
 
 from flask import abort, jsonify, request
-from models import storage
+from models.engine.db_storage import DBStorage
 from models.event import Event
 from models.user import User
 from models.review import Review
 from api.v1.views import app_views
-
+storage = DBStorage()
 
 @app_views.route('/reviews', methods=['GET'], strict_slashes=False)
 def get_reviews():

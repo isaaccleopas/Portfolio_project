@@ -12,7 +12,6 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Email, EqualTo
 from models.engine.db_storage import DBStorage
-from models import storage
 from models.user import User
 import os
 from .forms import CreateEventForm
@@ -100,6 +99,13 @@ def create_event():
         date_time = form.date_time.data
         slots_available = form.slots_available.data
 
+        print(f'Title: {title}')
+        print(f'Description: {description}')
+        print(f'Image File: {image_file}')
+        print(f'Venue: {venue}')
+        print(f'Date Time: {date_time}')
+        print(f'Slots Available: {slots_available}')
+
         event = None
 
         if image_file:
@@ -135,6 +141,8 @@ def create_event():
     else:
         print(form.errors)
         print(form.data)
+        print(request.form)
+
     return render_template('create_event.html', form=form, csrf_token=csrf_token)
 
 @routes_bp.route('/event/<event_id>')
