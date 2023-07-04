@@ -3,11 +3,10 @@
 This module handles all default RestFul API actions for Events.
 """
 from flask import abort, jsonify, request
-from models.engine.db_storage import DBStorage
+from models import storage
 from models.event import Event
 from api.v1.views import app_views
 
-storage = DBStorage()
 
 @app_views.route('/events', methods=['GET'], strict_slashes=False)
 def get_events():

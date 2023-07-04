@@ -5,7 +5,8 @@ import requests
 from flask import current_app
 from datetime import datetime
 from flask import flash
-from flask import Blueprint, render_template, request, redirect, url_for, session, abort
+from flask import session
+from flask import Blueprint, render_template, request, redirect, url_for, abort
 from flask_login import current_user as flask_login_current_user
 from flask_login import login_user, login_required, current_user, logout_user, LoginManager
 from flask_wtf import FlaskForm
@@ -91,20 +92,13 @@ def create_event():
     form = CreateEventForm()
     csrf_token = csrf.generate_csrf()
 
-    if request.method == 'POST' and form.validate_on_submit():
+    if form.validate_on_submit():
         title = form.title.data
         description = form.description.data
         image_file = form.image.data
         venue = form.venue.data
         date_time = form.date_time.data
         slots_available = form.slots_available.data
-
-        print(f'Title: {title}')
-        print(f'Description: {description}')
-        print(f'Image File: {image_file}')
-        print(f'Venue: {venue}')
-        print(f'Date Time: {date_time}')
-        print(f'Slots Available: {slots_available}')
 
         event = None
 
@@ -136,14 +130,12 @@ def create_event():
                 slots_available=slots_available,
                 user=flask_login_current_user
             )
-        event.save()
-        return redirect('/profile')
+        storage.new(event)
+        storage.save()
+        return redirect(url_for('routes.profile'))
     else:
-        print(form.errors)
-        print(form.data)
-        print(request.form)
 
-    return render_template('create_event.html', form=form, csrf_token=csrf_token)
+        return render_template('create_event.html', form=form)
 
 @routes_bp.route('/event/<event_id>')
 def view_event(event_id):
@@ -221,6 +213,7 @@ def reserve_event():
                                       slots_reserved=slots_reserved)
             storage.new(reservation)
             storage.save()
+            event = storage.session.merge(event)
             event.slots_available -= slots_reserved
             storage.save()
             return redirect(f'/event/{event_id}')
