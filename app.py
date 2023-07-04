@@ -13,12 +13,8 @@ app.config['SECRET_KEY'] = SECRET_KEY
 app.config['UPLOAD_FOLDER'] = 'web_jinja/static/images'
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
 app.url_map.strict_slashes = False
-app.logger.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-stream_handler = logging.StreamHandler()
-stream_handler.setFormatter(formatter)
-app.logger.addHandler(stream_handler)
-db = SQLAlchemy(app)
+db = SQLAlchemy()
+db.init_app(app)
 
 CORS(app, resources={r"/*": {"origins": "0.0.0.0"}})
 
