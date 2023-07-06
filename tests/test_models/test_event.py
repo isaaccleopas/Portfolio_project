@@ -2,19 +2,20 @@
 """
 Contains the TestEventDocs classes
 """
-from datetime import datetime
 import inspect
 import models
-from models import storage
-from models import event
-from models.base_model import BaseModel
 import pep8
 import unittest
-Event = event.Event
+from datetime import datetime
+from models.base_model import BaseModel
+from models.event import Event
+
+Event = models.event.Event
 
 
 class TestEventDocs(unittest.TestCase):
     """Tests to check the documentation and style of Event class"""
+
     @classmethod
     def setUpClass(cls):
         """Set up for the doc tests"""
@@ -36,9 +37,9 @@ class TestEventDocs(unittest.TestCase):
 
     def test_event_module_docstring(self):
         """Test for the event.py module docstring"""
-        self.assertIsNot(event.__doc__, None,
+        self.assertIsNot(models.event.__doc__, None,
                          "event.py needs a docstring")
-        self.assertTrue(len(event.__doc__) >= 1,
+        self.assertTrue(len(models.event.__doc__) >= 1,
                         "event.py needs a docstring")
 
     def test_event_class_docstring(self):
@@ -56,9 +57,9 @@ class TestEventDocs(unittest.TestCase):
             self.assertTrue(len(func[1].__doc__) >= 1,
                             "{:s} method needs a docstring".format(func[0]))
 
-
 class TestEvent(unittest.TestCase):
     """Test the Event class"""
+
     def test_is_subclass(self):
         """Test that Event is a subclass of BaseModel"""
         event = Event()

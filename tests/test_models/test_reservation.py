@@ -2,18 +2,19 @@
 """
 Contains the TestReservationDocs classes
 """
-from datetime import datetime
 import inspect
 import models
-from models import reservation
-from models.base_model import BaseModel
 import pep8
 import unittest
-Reservation = reservation.Reservation
+from models.base_model import BaseModel
+from models.reservation import Reservation
+
+Reservation = models.reservation.Reservation
 
 
 class TestReservationDocs(unittest.TestCase):
     """Tests to check the documentation and style of Reservation class"""
+
     @classmethod
     def setUpClass(cls):
         """Set up for the doc tests"""
@@ -35,9 +36,9 @@ class TestReservationDocs(unittest.TestCase):
 
     def test_reservation_module_docstring(self):
         """Test for the reservation.py module docstring"""
-        self.assertIsNot(reservation.__doc__, None,
+        self.assertIsNot(models.reservation.__doc__, None,
                          "reservation.py needs a docstring")
-        self.assertTrue(len(reservation.__doc__) >= 1,
+        self.assertTrue(len(models.reservation.__doc__) >= 1,
                         "reservation.py needs a docstring")
 
     def test_reservation_class_docstring(self):
@@ -57,6 +58,7 @@ class TestReservationDocs(unittest.TestCase):
 
 class TestReservation(unittest.TestCase):
     """Test the Reservation class"""
+
     def test_is_subclass(self):
         """Test that Reservation is a subclass of BaseModel"""
         reservation = Reservation()
@@ -70,6 +72,30 @@ class TestReservation(unittest.TestCase):
         reservation = Reservation()
         self.assertTrue(hasattr(reservation, "event_id"))
         self.assertEqual(reservation.event_id, "")
+
+    def test_user_id_attr(self):
+        """Test that Reservation has attr user_id, and it's an empty string"""
+        reservation = Reservation()
+        self.assertTrue(hasattr(reservation, "user_id"))
+        self.assertEqual(reservation.user_id, "")
+
+    def test_slots_reserved_attr(self):
+        """Test that Reservation has attr slots_reserved, and it's 0"""
+        reservation = Reservation()
+        self.assertTrue(hasattr(reservation, "slots_reserved"))
+        self.assertEqual(reservation.slots_reserved, 0)
+
+    def test_event_attr(self):
+        """Test that Reservation has attr event, and it's None"""
+        reservation = Reservation()
+        self.assertTrue(hasattr(reservation, "event"))
+        self.assertIsNone(reservation.event)
+
+    def test_user_attr(self):
+        """Test that Reservation has attr user, and it's None"""
+        reservation = Reservation()
+        self.assertTrue(hasattr(reservation, "user"))
+        self.assertIsNone(reservation.user)
 
     def test_to_dict_creates_dict(self):
         """Test that to_dict method creates a dictionary with proper attrs"""

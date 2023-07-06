@@ -2,18 +2,19 @@
 """
 Contains the TestReviewDocs classes
 """
-from datetime import datetime
 import inspect
 import models
-from models import review
-from models.base_model import BaseModel
 import pep8
 import unittest
-Review = review.Review
+from models.base_model import BaseModel
+from models.review import Review
+
+Review = models.review.Review
 
 
 class TestReviewDocs(unittest.TestCase):
     """Tests to check the documentation and style of Review class"""
+
     @classmethod
     def setUpClass(cls):
         """Set up for the doc tests"""
@@ -35,9 +36,9 @@ class TestReviewDocs(unittest.TestCase):
 
     def test_review_module_docstring(self):
         """Test for the review.py module docstring"""
-        self.assertIsNot(review.__doc__, None,
+        self.assertIsNot(models.review.__doc__, None,
                          "review.py needs a docstring")
-        self.assertTrue(len(review.__doc__) >= 1,
+        self.assertTrue(len(models.review.__doc__) >= 1,
                         "review.py needs a docstring")
 
     def test_review_class_docstring(self):
@@ -57,6 +58,7 @@ class TestReviewDocs(unittest.TestCase):
 
 class TestReview(unittest.TestCase):
     """Test the Review class"""
+
     def test_is_subclass(self):
         """Test that Review is a subclass of BaseModel"""
         review = Review()

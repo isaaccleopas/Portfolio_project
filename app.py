@@ -2,7 +2,7 @@
 """Contains a Flask web application API"""
 import logging
 import os
-from flask import Flask
+from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy

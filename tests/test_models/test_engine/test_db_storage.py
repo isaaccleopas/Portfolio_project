@@ -16,9 +16,9 @@ from models.review import Review
 from models.user import User
 from sqlalchemy.orm import scoped_session, sessionmaker
 from models import storage
+
 DBStorage = db_storage.DBStorage
-classes = {"Event": Event, "Reservation": Reservation, "Review": Review,
-                   "User": User}
+classes = {"Event": Event, "Reservation": Reservation, "Review": Review, "User": User}
 
 class TestDBStorageDocs(unittest.TestCase):
     """Tests to check the documentation and style of DBStorage class"""
@@ -63,7 +63,7 @@ class TestDBStorage(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up the test environment"""
-        cls.storage = db_storage.DBStorage()
+        cls.storage = DBStorage()
         cls.storage.reload()
 
     @classmethod
@@ -86,7 +86,7 @@ class TestDBStorage(unittest.TestCase):
         """Test that new method adds an object to the current session"""
         user = User()
         self.storage.new(user)
-        session = scoped_session(sessionmaker())()
+        session = self.storage.session
         self.assertIn(user, session)
 
     def test_save(self):
@@ -94,7 +94,7 @@ class TestDBStorage(unittest.TestCase):
         user = User()
         self.storage.new(user)
         self.storage.save()
-        session = scoped_session(sessionmaker())()
+        session = self.storage.session
         self.assertNotIn(user, session.new)
 
     def test_delete(self):
@@ -103,12 +103,12 @@ class TestDBStorage(unittest.TestCase):
         self.storage.new(user)
         self.storage.save()
         self.storage.delete(user)
-        session = scoped_session(sessionmaker())()
+        session = self.storage.session
         self.assertNotIn(user, session)
 
     def test_reload(self):
         """Test that reload method reloads data from the database"""
-        session1 = self.storage._DBStorage__session
+        session1 = self.storage.session
         self.storage.reload()
-        session2 = self.storage._DBStorage__session
+        session2 = self.storage.session
         self.assertIsNot(session1, session2)

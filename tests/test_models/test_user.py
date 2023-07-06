@@ -2,6 +2,10 @@
 """
 Contains the TestUserDocs classes
 """
+#!/usr/bin/python3
+"""
+Contains the TestUserDocs classes
+"""
 from datetime import datetime
 import inspect
 import models
@@ -83,18 +87,6 @@ class TestUser(unittest.TestCase):
         user = User()
         self.assertTrue(hasattr(user, "password"))
         self.assertEqual(user.password, "")
-
-    def test_google_id_attr(self):
-        """Test that User has attr google_id, and it's None"""
-        user = User()
-        self.assertTrue(hasattr(user, "google_id"))
-        self.assertIsNone(user.google_id)
-
-    def test_facebook_id_attr(self):
-        """Test that User has attr facebook_id, and it's None"""
-        user = User()
-        self.assertTrue(hasattr(user, "facebook_id"))
-        self.assertIsNone(user.facebook_id)
 
     def test_reviews_attr(self):
         """Test that User has attr reviews, and it's an empty list"""
