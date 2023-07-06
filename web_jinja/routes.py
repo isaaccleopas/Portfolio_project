@@ -155,7 +155,7 @@ def view_event(event_id):
     else:
         return render_template('error.html', message='Failed to retrieve event')
 
-@routes_bp.route('/events')
+@routes_bp.route('/')
 def display_events():
     """Retrieve the first 9 events from the API"""
     response = requests.get('https://portfolioproject-production-496e.up.railway.app/api/v1/events')
