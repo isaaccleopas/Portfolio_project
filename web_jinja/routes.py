@@ -140,11 +140,11 @@ def create_event():
 @routes_bp.route('/event/<event_id>')
 def view_event(event_id):
     """Retrieve the event from the API using the event_id"""
-    response = requests.get(f'http://0.0.0.0:5000/api/v1/events/{event_id}')
+    response = requests.get(f'https://portfolioproject-production-496e.up.railway.app/api/v1/events/{event_id}')
     if response.status_code == 200:
         event = response.json()
         event['has_passed'] = datetime.strptime(event['date_time'], '%Y-%m-%dT%H:%M:%S') < datetime.now()
-        reviews_response = requests.get(f'http://0.0.0.0:5000/api/v1/events/{event_id}/reviews')
+        reviews_response = requests.get(f'https://portfolioproject-production-496e.up.railway.app/api/v1/events/{event_id}/reviews')
         if reviews_response.status_code == 200:
             reviews = reviews_response.json()
             event['reviews'] = reviews
@@ -158,7 +158,7 @@ def view_event(event_id):
 @routes_bp.route('/events')
 def display_events():
     """Retrieve the first 9 events from the API"""
-    response = requests.get('http://0.0.0.0:5000/api/v1/events')
+    response = requests.get('https://portfolioproject-production-496e.up.railway.app/api/v1/events')
     if response.status_code == 200:
         events = response.json()
 
