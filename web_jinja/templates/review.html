@@ -1,14 +1,16 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h1>Review Event</h1>
-  <form method="POST" action="{{ url_for('routes.review_event', event_id=event.id) }}">
-    <div>
-      <label for="content">Your Review:</label>
-      <textarea id="content" name="content" rows="5" required></textarea>
-    </div>
-    <div>
-      <button type="submit">Submit Review</button>
-    </div>
-  </form>
+  <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; text-align: center;">
+    <h1>Review Event</h1>
+    <form style="margin-top: 20px;" method="POST" action="{{ url_for('routes.review_event', event_id=event.id) }}">
+      <div style="margin-bottom: 10px;">
+        <label for="content">Your Review:</label>
+        <textarea id="content" name="content" rows="5" required></textarea>
+      </div>
+      <div>
+        <button type="submit">Submit Review</button>
+      </div>
+    </form>
+  </div>
 {% endblock %}

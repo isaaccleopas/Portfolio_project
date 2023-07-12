@@ -4,6 +4,16 @@
 {% block title %}Event Grid{% endblock %}
 
 {% block content %}
+  <style>
+    .event-grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      grid-gap: 20px;
+      justify-items: center; /* Center-align the grid items horizontally */
+      align-items: center; /* Center-align the grid items vertically */
+    }
+  </style>
+
   <div class="event-grid-container">
     {% for event in events %}
       <div class="event-item">

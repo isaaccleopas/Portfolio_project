@@ -1,8 +1,10 @@
-<html>
-<head>
-    <title>Profile</title>
-</head>
-<body>
+<!-- profile.html -->
+{% extends 'base.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+  <div style="display: flex; flex-direction: column; justify-content: space-between; height: 100vh; align-items: center;">
     <h1>Welcome, {{ user.name }}</h1>
     <p>Email: {{ user.email }}</p>
     <a href="/signout">Sign Out</a>
@@ -10,5 +12,5 @@
     <a href="/create_event">Create Event</a>
     <br>
     <a href="/">Display Events</a>
-</body>
-</html>
+  </div>
+{% endblock %}

@@ -1,10 +1,42 @@
-<!-- base.html -->
 <html>
   <head>
     <title>{% block title %}Events Hub{% endblock %}</title>
     <!-- Add necessary CSS files for social media icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+      /* CSS styles for the header navigation */
+      header {
+        display: flex;
+        justify-content: flex-end; /* Align navigation to the right */
+      }
+
+      /* CSS styles for the navigation buttons */
+      nav ul {
+        list-style: none;
+        display: flex;
+        justify-content: flex-end; /* Align buttons to the right */
+        gap: 10px; /* Add spacing between buttons */
+      }
+
+      nav ul li {
+        display: flex;
+      }
+
+      nav ul li a {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #f44336;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+      }
+
+      /* CSS styles for the footer */
+      footer {
+        text-align: center; /* Center-align the content */
+      }
+    </style>
   </head>
   <body>
     <header>

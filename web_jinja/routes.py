@@ -161,7 +161,12 @@ def home():
     response = requests.get('https://portfolioproject-production-496e.up.railway.app/api/v1/events')
     if response.status_code == 200:
         events = response.json()
-
+        for event in events:
+            if event['image'] is not None:
+                event['image_path'] = '/static/images/' + event['image']
+            else:
+                event['image_path'] = '/static/images/default.jpg'
+            event['has_passed'] = datetime.strptime(event['date_time'], '%Y-%m-%dT%H:%M:%S') < datetime.now()
         return render_template('home.html', events=events)
     else:
         return render_template('error.html', message='Failed to retrieve events')

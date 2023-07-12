@@ -1,19 +1,27 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Signin</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}Signin{% endblock %}
+
+{% block content %}
+  <div style="text-align: center;">
     <h1>Signin</h1>
     <form method="POST" action="{{ url_for('routes.signin') }}">
-        {{ form.csrf_token }}
-        <label for="email">Email:</label>
-        {{ form.email(class="form-control") }}
-        <br>
-        <label for="password">Password:</label>
-        {{ form.password(class="form-control") }}
-        <br>
-        {{ form.submit(class="btn btn-primary") }}
+      {{ form.csrf_token }}
+      <label for="email">Email:</label>
+      {{ form.email(class="form-control") }}
+      <br>
+      <label for="password">Password:</label>
+      {{ form.password(class="form-control") }}
+      <br>
+      {{ form.submit(class="btn btn-primary btn-nav") }}
     </form>
-</body>
-</html>
+    <p>Don't have an account? <a href="/signup">Signup</a></p>
+  </div>
+{% endblock %}
+
+<style>
+  .btn-nav {
+    background-color: #f44336;
+    color: white;
+  }
+</style>

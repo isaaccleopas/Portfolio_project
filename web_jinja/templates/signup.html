@@ -1,21 +1,29 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Signup</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}Signup{% endblock %}
+
+{% block content %}
+  <div style="text-align: center;">
     <h1>Signup</h1>
-        <form method="POST" action="{{ url_for('routes.signup') }}">
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required>
-        <br>
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
-        <br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-        <br>
-        <input type="submit" value="Signup">
+    <form method="POST" action="{{ url_for('routes.signup') }}">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required>
+      <br>
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required>
+      <br>
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required>
+      <br>
+      <input type="submit" value="Signup" class="btn btn-primary btn-nav">
     </form>
-</body>
-</html>
+    <p>Already have an account? <a href="/signin">Sign In</a></p>
+  </div>
+{% endblock %}
+
+<style>
+  .btn-nav {
+    background-color: #f44336;
+    color: white;
+  }
+</style>
