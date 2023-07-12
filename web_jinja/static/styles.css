@@ -5,9 +5,8 @@
 }
 
 .event-item {
-  border: 1px solid #ccc;
-  padding: 10px;
-  max-width: 300px; /* Set a maximum width for the event item */
+  width: 100%;
+  max-width: 300px;
 }
 
 .event-content {

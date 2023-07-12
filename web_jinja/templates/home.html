@@ -5,8 +5,6 @@
 
 {% block content %}
   <div class="event-grid-container">
-    <div class="event-grid-container" style="max-width: 300px;">
-    <!-- Rest of the event item content -->
     {% for event in events %}
       <div class="event-item">
         <a href="/event/{{ event.id }}">
@@ -35,6 +33,5 @@
         </a>
       </div>
     {% endfor %}
-    </div>
   </div>
 {% endblock %}
