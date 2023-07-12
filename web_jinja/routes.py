@@ -7,8 +7,8 @@ from datetime import datetime
 from flask import flash
 from flask import session
 from flask import Blueprint, render_template, request, redirect, url_for, abort
-from flask_login import current_user as flask_login_current_user
-from flask_login import login_user, login_required, current_user, logout_user, LoginManager
+from flask_login import current_user
+from flask_login import login_user, login_required, logout_user, LoginManager
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Email, EqualTo
@@ -86,7 +86,7 @@ def get_current_user():
 @login_required
 def create_event():
     """ Creating event"""
-    if not flask_login_current_user:
+    if not current_user.is_authenticated:
         return redirect(url_for('routes.signin'))
 
     form = CreateEventForm()
@@ -156,25 +156,23 @@ def view_event(event_id):
         return render_template('error.html', message='Failed to retrieve event')
 
 @routes_bp.route('/')
-def display_events():
-    """Retrieve the first 9 events from the API"""
+def home():
+    """Retrieve events from the API"""
     response = requests.get('https://portfolioproject-production-496e.up.railway.app/api/v1/events')
     if response.status_code == 200:
         events = response.json()
 
-        for event in events:
-            if event['image'] is not None:
-                event['image_path'] = 'web_jinja/static/images' + event['image']
-            else:
-                event['image_path'] = '/static/images/default.jpg'
-            event['has_passed'] = datetime.strptime(event['date_time'], '%Y-%m-%dT%H:%M:%S') < datetime.now()
-        return render_template('events.html', events=events)
+        return render_template('home.html', events=events)
     else:
         return render_template('error.html', message='Failed to retrieve events')
 
 @routes_bp.route('/events/<event_id>/review', methods=['GET', 'POST'])
 @login_required
 def review_event(event_id):
+    """Review event"""
+    if not current_user.is_authenticated:
+        return redirect(url_for('routes.signin'))
+
     if request.method == 'POST':
         content = request.form.get('content')
         if content:
@@ -197,9 +195,10 @@ def review_event(event_id):
 @login_required
 def reserve_event():
     """Function that reserves a slot for a user"""
-    user = get_current_user()
-    if not user:
+    if not current_user.is_authenticated:
         return redirect(url_for('routes.signin'))
+
+    user_id = current_user.id
 
     event_id = request.form.get('event_id')
 
@@ -207,7 +206,6 @@ def reserve_event():
 
     if event:
         if event.slots_available > 0:
-            user_id = user.id
             slots_reserved = 1
             reservation = Reservation(user_id=user_id, event_id=event_id,
                                       slots_reserved=slots_reserved)
@@ -226,6 +224,9 @@ def reserve_event():
 @login_required
 def profile():
     """profile display"""
+    if not current_user.is_authenticated:
+        return redirect(url_for('routes.signin'))
+
     user = current_user
 
     if user:
@@ -237,5 +238,8 @@ def profile():
 @login_required
 def signout():
     """signout function"""
+    if not current_user.is_authenticated:
+        return redirect(url_for('routes.signin'))
+
     session.pop('user_id', None)
     return redirect('/signin')

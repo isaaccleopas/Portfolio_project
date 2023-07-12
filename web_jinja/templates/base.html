@@ -1,18 +1,38 @@
-<!DOCTYPE html>
+<!-- base.html -->
 <html>
-<head>
-    <title>My Web App</title>
-    <!-- Add your CSS and other head elements here -->
-</head>
-<body>
-    <!-- Add your navigation bar or header here -->
-    
-    <!-- Content specific to child templates -->
-    {% block content %}
-    {% endblock %}
-    
-    <!-- Add your footer here -->
-    
-    <!-- Add your JavaScript and other scripts here -->
-</body>
+  <head>
+    <title>{% block title %}Events Hub{% endblock %}</title>
+    <!-- Add necessary CSS files for social media icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <header>
+      <!-- Your header content goes here -->
+      <nav>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/create_event">Create Event</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      {% block content %}
+      {% endblock %}
+    </main>
+
+    <footer>
+      <p>&copy; {{ current_year }} Events Hub. All rights reserved.</p>
+      <div class="social-media">
+        <a href="https://twitter.com/ILawnar" target="_blank"><i class="fab fa-twitter"></i></a>
+        <a href="https://github.com/isaaccleopas" target="_blank"><i class="fab fa-github"></i></a>
+        <a href="https://www.linkedin.com/in/isaac-cleopas-lawnar-2aa88b151/" target="_blank"><i class="fab fa-linkedin"></i></a>
+      </div>
+    </footer>
+
+    <!-- Add necessary JavaScript files for social media icons -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+  </body>
 </html>

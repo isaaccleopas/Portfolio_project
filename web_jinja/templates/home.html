@@ -1,11 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Event Grid</title>
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
-  <div class="event-grid">
+<!-- home.html -->
+{% extends 'base.html' %}
+
+{% block title %}Event Grid{% endblock %}
+
+{% block content %}
+  <div class="event-grid-container">
+    <div class="event-grid-container" style="max-width: 300px;">
+    <!-- Rest of the event item content -->
     {% for event in events %}
       <div class="event-item">
         <a href="/event/{{ event.id }}">
@@ -33,10 +34,7 @@
           </div>
         </a>
       </div>
-      {% if loop.index % 3 == 0 %}
-        <div class="clear"></div>
-      {% endif %}
     {% endfor %}
+    </div>
   </div>
-</body>
-</html>
+{% endblock %}

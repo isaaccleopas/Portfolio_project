@@ -10,7 +10,7 @@ from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__, template_folder='web_jinja/templates')
 SECRET_KEY = os.urandom(32)
 app.config['SECRET_KEY'] = SECRET_KEY
-app.config['UPLOAD_FOLDER'] = 'web_jinja/static/images'
+app.config['UPLOAD_FOLDER'] = ''
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
 app.url_map.strict_slashes = False
 db = SQLAlchemy()
