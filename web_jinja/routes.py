@@ -124,7 +124,7 @@ def create_event():
                 venue=venue,
                 date_time=date_time,
                 slots_available=slots_available,
-                user=flask_login_current_user
+                user=current_user
             )
         else:
             event = Event(
@@ -133,7 +133,7 @@ def create_event():
                 venue=venue,
                 date_time=date_time,
                 slots_available=slots_available,
-                user=flask_login_current_user
+                user=current_user
             )
         storage.new(event)
         storage.save()
