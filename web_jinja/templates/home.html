@@ -21,7 +21,7 @@
           <div class="event-content">
             <div class="event-image">
               {% if event.image %}
-                <img src="{{ url_for('static', filename='images/' + event.image) }}" alt="Event Image">
+                <img src="/web_jinja/static/images/{{ event.image.split('/')[-1] }}" alt="Event Image">
               {% else %}
                 <img src="{{ url_for('static', filename='images/default.jpg') }}" alt="Default Event Image">
               {% endif %}
