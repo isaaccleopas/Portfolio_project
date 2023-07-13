@@ -109,7 +109,7 @@ def create_event():
 
         if image_file:
             filename = secure_filename(image_file.filename)
-            filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+            filepath = os.path.join('web_jinja/static/images/', filename)
             image_file.save(filepath)
 
             with open(filepath, 'rb') as f:
