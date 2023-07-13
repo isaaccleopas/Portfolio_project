@@ -33,6 +33,11 @@ def load_user(user_id):
     """Loads the user object based on the user_id"""
     return storage.get(User, user_id)
 
+@login_manager.unauthorized_handler
+def unauthorized():
+    flash('Please sign in to access this page.', 'error')
+    return redirect(url_for('routes.signin'))
+
 class SigninForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
