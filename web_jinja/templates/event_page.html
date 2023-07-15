@@ -5,7 +5,7 @@
     {% if event.image %}
       <img src="{{ url_for('static', filename='images/' + event.image) }}" alt="Event Image">
     {% else %}
-      <img src="{{ url_for('static', filename='images/default.png') }}" alt="Default Event Image">
+      <img src="{{ url_for('static', filename='default.png') }}" alt="Default Event Image">
     {% endif %}
     <h1>{{ event.title }}</h1>
     <p>Date and Time: {{ event.date_time }}</p>
