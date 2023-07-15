@@ -2,12 +2,12 @@
 
 {% block content %}
   <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; text-align: center;">
-    <h1>{{ event.title }}</h1>
     {% if event.image %}
       <img src="{{ url_for('static', filename='images/' + event.image) }}" alt="Event Image">
     {% else %}
-      <img src="{{ url_for('static', filename='images/default.jpg') }}" alt="Default Event Image">
+      <img src="{{ url_for('static', filename='images/default.png') }}" alt="Default Event Image">
     {% endif %}
+    <h1>{{ event.title }}</h1>
     <p>Date and Time: {{ event.date_time }}</p>
     <p>Venue: {{ event.venue }}</p>
     <p>Slots Available: {{ event.slots_available }}</p>
@@ -29,7 +29,7 @@
     <hr>
 
     {% if event.reviews %}
-      <h2>Reviews</h2>
+      <h1>Reviews</h1>
       <ul>
         {% for review in event.reviews %}
           <li>

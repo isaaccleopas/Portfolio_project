@@ -17,15 +17,15 @@
   <div class="event-grid-container">
     {% for event in events %}
       <div class="event-item">
-        <a href="/event/{{ event.id }}">
-          <div class="event-content">
             <div class="event-image">
               {% if event.image %}
                 <img src="{{ url_for('static', filename='images/' + event.image) }}" alt="Event Image">
               {% else %}
-                <img src="web_jinja/static/images/default.png" alt="Default Event Image">
+                <img src="{{ url_for('static', filename='images/default.png') }}" alt="Default Event Image">
               {% endif %}
             </div>
+            <a href="/event/{{ event.id }}">
+            <div class="event-content">
             <div class="event-details">
               <h3>{{ event.title }}</h3>
               <p>Date: {{ event.date_time }}</p>
@@ -39,8 +39,8 @@
                 </form>
               {% endif %}
             </div>
+          </a>
           </div>
-        </a>
       </div>
     {% endfor %}
   </div>

@@ -7,7 +7,7 @@ from flask_cors import CORS
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 
-app = Flask(__name__, template_folder='web_jinja/templates', static_url_path='/web_jinja/static/images/')
+app = Flask(__name__, template_folder='web_jinja/templates', static_url_path='/')
 SECRET_KEY = os.urandom(32)
 app.static_folder = 'static'
 app.config['SECRET_KEY'] = SECRET_KEY
