@@ -23,7 +23,7 @@
               {% if event.image %}
                 <img src="{{ url_for('static', filename='images/' + event.image) }}" alt="Event Image">
               {% else %}
-                <img src="{{ url_for('static', filename='images/default.png') }}" alt="Default Event Image">
+                <img src="{{ url_for('static', filename='/default.png') }}" alt="Default Event Image">
               {% endif %}
             </div>
             <div class="event-details">
