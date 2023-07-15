@@ -124,7 +124,7 @@ def create_event():
                 venue=venue,
                 date_time=date_time,
                 slots_available=slots_available,
-                user=current_user
+                user=current_user._get_current_object()
             )
         else:
             event = Event(
@@ -133,7 +133,7 @@ def create_event():
                 venue=venue,
                 date_time=date_time,
                 slots_available=slots_available,
-                user=current_user
+                user=current_user._get_current_object()
             )
         storage.new(event)
         storage.save()
