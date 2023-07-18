@@ -2,6 +2,7 @@
 """ Starts a Flash Web Application """
 import base64
 import requests
+import models
 from flask import current_app
 from datetime import datetime
 from flask import flash
@@ -102,7 +103,7 @@ def create_event():
         description = form.description.data
         image_file = form.image.data
         venue = form.venue.data
-        date_time = form.date_time.data
+        date_time = datetime.combine(form.date.data, form.time.data)
         slots_available = form.slots_available.data
 
         event = None
@@ -229,6 +230,18 @@ def reserve_event():
             return render_template('error.html', message='No slots available')
     else:
         return render_template('error.html', message='Failed to retrieve event')
+
+@routes_bp.route("/search", methods=["GET"])
+def search_events():
+    """Searches events based on title and venue"""
+    query = request.args.get("query", "").lower()
+    results = []
+
+    if query:
+        events = models.storage.all(Event).values()
+        results = [event for event in events if query in getattr(event, "title", "").lower() or query in getattr(event, "venue", "").lower()]
+
+    return render_template("search_results.html", results=results)
 
 @routes_bp.route('/profile')
 @login_required
