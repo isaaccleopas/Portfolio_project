@@ -37,6 +37,7 @@ How to install and set up this project locally.
    pip install -r requirements.txt
 
 ## Usage
+![0f052c64-5cde-4443-9ebf-a3fcd3205847](https://github.com/isaaccleopas/Portfolio_project/assets/94404627/968306f3-ed85-45c6-9a95-5630284ce58c)
 
 ## Contributing
 We welcome contributions from the community! If you find a bug or have a feature request, please open an issue or submit a pull request. Make sure to follow the guidelines outlined in [https://github.com/isaaccleopas/Portfolio_project/blob/master/CONTRIBUTING.md].
