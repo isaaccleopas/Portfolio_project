@@ -103,7 +103,7 @@ def create_event():
         description = form.description.data
         image_file = form.image.data
         venue = form.venue.data
-        date_time = datetime.combine(form.date.data, form.time.data)
+        date_time = form.date_time.data
         slots_available = form.slots_available.data
 
         event = None
